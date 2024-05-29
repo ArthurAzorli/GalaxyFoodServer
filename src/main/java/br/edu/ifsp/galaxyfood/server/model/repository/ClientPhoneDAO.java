@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ClientPhoneDAO extends JpaRepository<ClientPhone, String> {
 
-    ClientPhone getPhoneById(String id);
+    ClientPhone getClientPhoneByPhone(String phone);
 }

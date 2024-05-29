@@ -53,7 +53,6 @@ public class Restaurant implements Serializable {
     @JoinColumn(name="owner_id", nullable=false, columnDefinition = "VARCHAR", referencedColumnName = "id")
     private RestaurantOwner owner;
 
-
     public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Address address, RestaurantOwner owner, List<ClientPhone> phones) {
         this.id = id;
         this.cnpj = cnpj;

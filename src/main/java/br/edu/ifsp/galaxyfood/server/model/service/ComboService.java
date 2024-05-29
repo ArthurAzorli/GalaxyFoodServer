@@ -1,7 +1,10 @@
 package br.edu.ifsp.galaxyfood.server.model.service;
 
+import br.edu.ifsp.galaxyfood.server.model.domain.Combo;
 import br.edu.ifsp.galaxyfood.server.model.domain.Food;
+import br.edu.ifsp.galaxyfood.server.model.dto.InComboDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InFoodDTO;
+import br.edu.ifsp.galaxyfood.server.model.repository.ComboDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.FoodDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.PackageDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
@@ -10,12 +13,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class FoodService {
+public class ComboService {
 
     private final RestaurantDAO restaurantDAO;
 
@@ -23,17 +25,19 @@ public class FoodService {
 
     private final FoodDAO foodDAO;
 
-    public FoodService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO) {
+    private final ComboDAO comboDAO;
+
+    public ComboService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO, ComboDAO comboDAO) {
         this.restaurantDAO = restaurantDAO;
         this.packageDAO = packageDAO;
         this.foodDAO = foodDAO;
+        this.comboDAO = comboDAO;
     }
 
-    public Food create(InFoodDTO dto, HttpSession session) throws ExceptionController {
+    public Combo create(InComboDTO dto, HttpSession session) throws ExceptionController {
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
-        if (dto.description() == null) throw new ExceptionController(400, "Description not sent!");
         if (dto.parent() == null) throw new ExceptionController(400, "Parent not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
@@ -52,16 +56,16 @@ public class FoodService {
         var restaurant = restaurantDAO.getRestaurantById(id);
         var parent = packageDAO.getPackageById(dto.parent());
 
-        if (parent.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos em uma pasta que não seja sua!");
+        if (parent.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar combos em uma pasta que não seja sua!");
 
-        return foodDAO.save(new Food(dto.name(), dto.price(), dto.description(), dto.image(), parent));
+        return comboDAO.save(new Combo(dto.name(), dto.price(), dto.image(), parent));
     }
 
-    public Food update(UUID idFood, InFoodDTO dto, HttpSession session) throws ExceptionController {
+    public Food update(UUID idCombo, InComboDTO dto, HttpSession session) throws ExceptionController {
+
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
-        if (dto.description() == null) throw new ExceptionController(400, "Description not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
         if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
@@ -77,15 +81,14 @@ public class FoodService {
 
         var restaurant = restaurantDAO.getRestaurantById(id);
 
-        if (!foodDAO.existsById(idFood)) throw new ExceptionController(404, "Alimento não encontrado!");
+        if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
 
-        var food = foodDAO.getFoodById(idFood);
+        var food = foodDAO.getFoodById(idCombo);
 
         if (!food.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar alimentos que não sejam seus!");
 
         food.setName(dto.name());
         food.setPrice(dto.price());
-        food.setDescription(dto.description());
         food.setImage(dto.image());
 
         return foodDAO.save(food);
@@ -149,5 +152,4 @@ public class FoodService {
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
         return foodDAO.getAllByRestaurant(idRestaurant);
     }
-    
 }

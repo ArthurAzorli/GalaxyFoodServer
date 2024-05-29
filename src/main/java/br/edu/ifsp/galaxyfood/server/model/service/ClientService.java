@@ -160,7 +160,7 @@ public class ClientService {
 
         if (!clientPhoneDAO.existsById(phone)) throw new ExceptionController(409, "Telefone não está cadastrado!");
 
-        var selectedPhone = clientPhoneDAO.getPhoneById(phone);
+        var selectedPhone = clientPhoneDAO.getClientPhoneByPhone(phone);
         var client = clientDAO.getClientById(id);
 
         if (!selectedPhone.getClient().getId().equals(client.getId())) throw new ExceptionController(409, "Telefone não está cadastrado!");

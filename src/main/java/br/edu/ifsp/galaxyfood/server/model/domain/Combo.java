@@ -44,6 +44,14 @@ public class Combo extends PackageItem {
         super.parent = parent;
     }
 
+    public Combo(String name, BigDecimal price, byte[] image, Package parent) {
+        super.id = UUID.randomUUID();
+        super.name = name;
+        super.price = price;
+        super.image = image;
+        super.parent = parent;;
+    }
+
     public Combo() {
     }
 
