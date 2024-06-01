@@ -5,5 +5,5 @@ import br.edu.ifsp.galaxyfood.server.model.domain.PackageItem;
 
 import java.util.UUID;
 
-public record InBuyItemDTO(UUID idBuy, UUID idItem, Integer quantity) {
+public record InBuyItemDTO(UUID idItem, Integer quantity) {
 }

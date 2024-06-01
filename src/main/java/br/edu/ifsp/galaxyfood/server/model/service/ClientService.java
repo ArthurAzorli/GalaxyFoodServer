@@ -4,7 +4,7 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Address;
 import br.edu.ifsp.galaxyfood.server.model.domain.Client;
 import br.edu.ifsp.galaxyfood.server.model.domain.ClientAddress;
 import br.edu.ifsp.galaxyfood.server.model.domain.ClientPhone;
-import br.edu.ifsp.galaxyfood.server.model.dto.AddressDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientAddressDAO;
@@ -169,7 +169,7 @@ public class ClientService {
         return clientDAO.getClientById(id);
     }
 
-    public Client addAddress(AddressDTO dto, HttpSession session){
+    public Client addAddress(InAddressDTO dto, HttpSession session){
         if (dto.street() == null) throw new ExceptionController(400, "Street not send!");
         if (dto.number() == null) throw new ExceptionController(400, "Number not send!");
         if (dto.neighborhood() == null) throw new ExceptionController(400, "Neighborhood not send!");
