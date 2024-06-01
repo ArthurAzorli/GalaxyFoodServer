@@ -1,8 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.controller;
 
-import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.*;
 import br.edu.ifsp.galaxyfood.server.model.service.ClientService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
@@ -22,13 +20,9 @@ public class ClientController {
     private ClientService service;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(
-            @RequestParam(value = "login") String login,
-            @RequestParam(value = "password") String password,
-            HttpSession session
-    ) {
+    public ResponseEntity<Object> login(@RequestBody LoginDTO dto, HttpSession session) {
         try {
-            var client = service.login(login, password);
+            var client = service.login(dto.login(), dto.password());
 
             session.setAttribute("user", client.getId());
             session.setAttribute("type", "client");
@@ -94,13 +88,9 @@ public class ClientController {
     }
 
     @PutMapping("/changepassword")
-    public ResponseEntity<Object> changePassword(
-        @RequestParam(value = "oldPassword") String oldPassword,
-        @RequestParam(value = "newPassword") String newPassword,
-        HttpSession session
-    ) {
+    public ResponseEntity<Object> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
         try {
-            service.changePassword(oldPassword, newPassword, session);
+            service.changePassword(dto.oldPassword(), dto.newPassword(), session);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Senha atualizada com sucesso!");

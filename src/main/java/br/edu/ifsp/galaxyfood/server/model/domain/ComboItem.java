@@ -44,6 +44,6 @@ public class ComboItem implements Serializable {
     }
 
     public OutComboItemDTO toDTO(){
-        return new OutComboItemDTO(id, quantity, combo.getId(), item.toDTO());
+        return new OutComboItemDTO(id, quantity, combo.getId(), item.foodToDTO());
     }
 }
