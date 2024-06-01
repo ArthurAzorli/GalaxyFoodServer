@@ -29,9 +29,8 @@ public class BuyService {
 
     private final AddressDAO addressDAO;
 
-    public BuyService(@NonNull BuyDAO buyDAO, @NonNull BuyItemDAO itemDAO, @NonNull PackageItemDAO packageItemDAO, @NonNull ClientDAO clientDAO, @NonNull RestaurantDAO restaurantDAO, @NonNull AddressDAO addressDAO) {
+    public BuyService(@NonNull BuyDAO buyDAO, @NonNull PackageItemDAO packageItemDAO, @NonNull ClientDAO clientDAO, @NonNull RestaurantDAO restaurantDAO, @NonNull AddressDAO addressDAO) {
         this.buyDAO = buyDAO;
-        this.itemDAO = itemDAO;
         this.packageItemDAO = packageItemDAO;
         this.clientDAO = clientDAO;
         this.restaurantDAO = restaurantDAO;
