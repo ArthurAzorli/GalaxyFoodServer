@@ -7,6 +7,7 @@ import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
-public record InRestaurantDTO(String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Address address, RestaurantOwner owner) {
+public record InRestaurantDTO(String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, AddressDTO address, UUID owner) {
 }

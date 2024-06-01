@@ -43,6 +43,9 @@ public class Restaurant implements Serializable {
     @Column(columnDefinition = "DECIMAL")
     private BigDecimal score;
 
+    @Column(nullable = false)
+    private int countScore;
+
     @OneToOne(cascade = CascadeType.ALL)
     private Address address;
 
@@ -53,7 +56,7 @@ public class Restaurant implements Serializable {
     @JoinColumn(name="owner_id", nullable=false, columnDefinition = "VARCHAR", referencedColumnName = "id")
     private RestaurantOwner owner;
 
-    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Address address, RestaurantOwner owner, List<ClientPhone> phones) {
+    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Integer countScore, Address address, RestaurantOwner owner, List<ClientPhone> phones) {
         this.id = id;
         this.cnpj = cnpj;
         this.email = email;
@@ -62,12 +65,13 @@ public class Restaurant implements Serializable {
         this.image = image;
         this.password = Cripto.md5(password);
         this.score = score;
+        this.countScore = countScore;
         this.address = address;
         this.owner = owner;
         this.phones = phones;
     }
 
-    public Restaurant(String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Address address, RestaurantOwner owner, List<ClientPhone> phones) {
+    public Restaurant(String cnpj, String email, String name, String specialty, byte[] image, String password, BigDecimal score, Integer countScore, Address address, RestaurantOwner owner) {
         this.id = UUID.randomUUID();
         this.cnpj = cnpj;
         this.email = email;
@@ -76,9 +80,9 @@ public class Restaurant implements Serializable {
         this.image = image;
         this.password = Cripto.md5(password);
         this.score = score;
+        this.countScore = countScore;
         this.address = address;
         this.owner = owner;
-        this.phones = phones;
     }
 
     public Restaurant() {

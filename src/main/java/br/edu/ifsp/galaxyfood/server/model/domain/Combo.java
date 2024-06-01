@@ -15,10 +15,10 @@ import java.util.UUID;
 @Entity
 public class Combo extends PackageItem {
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<PackageItem> items = new ArrayList<>();
+    @OneToMany
+    private List<ComboItem> items = new ArrayList<>();
 
-    public Combo(UUID id, String name, BigDecimal price, byte[] image, Package parent, List<PackageItem> items) {
+    public Combo(UUID id, String name, BigDecimal price, byte[] image, Package parent, List<ComboItem> items) {
         super.id = id;
         super.name = name;
         super.price = price;
@@ -27,7 +27,7 @@ public class Combo extends PackageItem {
         this.items = items;
     }
 
-    public Combo(String name, BigDecimal price, byte[] image, Package parent, List<PackageItem> items) {
+    public Combo(String name, BigDecimal price, byte[] image, Package parent, List<ComboItem> items) {
         super.id = UUID.randomUUID();
         super.name = name;
         super.price = price;
@@ -55,8 +55,9 @@ public class Combo extends PackageItem {
     public Combo() {
     }
 
-    public boolean addItem(PackageItem item){
+    public boolean addItem(ComboItem item){
         if (items.contains(item)) return false;
         return items.add(item);
     }
+
 }

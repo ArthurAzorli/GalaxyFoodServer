@@ -4,7 +4,7 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Address;
 import br.edu.ifsp.galaxyfood.server.model.domain.Client;
 import br.edu.ifsp.galaxyfood.server.model.domain.ClientAddress;
 import br.edu.ifsp.galaxyfood.server.model.domain.ClientPhone;
-import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.AddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientAddressDAO;
@@ -142,7 +142,7 @@ public class ClientService {
         var newPhone = new ClientPhone(phone, client);
         clientPhoneDAO.save(newPhone);
 
-        return clientDAO.save(client);
+        return clientDAO.getClientById(id);
     }
 
     public Client remPhone(String phone, HttpSession session){
@@ -165,12 +165,11 @@ public class ClientService {
 
         if (!selectedPhone.getClient().getId().equals(client.getId())) throw new ExceptionController(409, "Telefone não está cadastrado!");
 
-        client.getPhones().remove(selectedPhone);
         clientPhoneDAO.delete(selectedPhone);
-        return clientDAO.save(client);
+        return clientDAO.getClientById(id);
     }
 
-    public Client addAddress(InAddressDTO dto, HttpSession session){
+    public Client addAddress(AddressDTO dto, HttpSession session){
         if (dto.street() == null) throw new ExceptionController(400, "Street not send!");
         if (dto.number() == null) throw new ExceptionController(400, "Number not send!");
         if (dto.neighborhood() == null) throw new ExceptionController(400, "Neighborhood not send!");
@@ -206,7 +205,7 @@ public class ClientService {
         addressDAO.save(address);
         clientAddressDAO.save(clientAddress);
 
-        return clientDAO.save(client);
+        return clientDAO.getClientById(client.getId());
     }
 
     public Client remAddress(UUID idAddress, HttpSession session){
@@ -232,10 +231,9 @@ public class ClientService {
 
         if (!selectedAddress.getClient().getId().equals(client.getId())) throw new ExceptionController(409, "Telefone não está cadastrado!");
 
-        client.getAddresses().remove(selectedAddress);
         clientAddressDAO.delete(selectedAddress);
         addressDAO.delete(selectedAddress.getAddress());
-        return clientDAO.save(client);
+        return clientDAO.getClientById(client.getId());
     }
 
     public void delete(HttpSession session) throws ExceptionController{
@@ -248,6 +246,8 @@ public class ClientService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
+
+        if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
 
         clientDAO.deleteById(id);
 

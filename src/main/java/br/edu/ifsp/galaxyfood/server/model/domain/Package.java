@@ -40,37 +40,29 @@ public class Package implements Serializable {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PackageItem> items = new ArrayList<>();
 
-    public Package(UUID id, String name, byte[] image, Restaurant restaurant, List<Package> children, List<PackageItem> items) {
+    public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.restaurant = restaurant;
+        this.parent = parent;
         this.children = children;
         this.items = items;
     }
 
-    public Package(String name, byte[] image, Restaurant restaurant, List<Package> children, List<PackageItem> items) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-        this.image = image;
-        this.restaurant = restaurant;
-        this.children = children;
-        this.items = items;
-    }
-
-    public Package(UUID id, String name, byte[] image, Restaurant restaurant, List<PackageItem> items) {
+    public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.restaurant = restaurant;
-        this.items = items;
+        this.parent = parent;
     }
 
-    public Package(UUID id, String name, byte[] image, Restaurant restaurant) {
-        this.id = id;
+    public Package(String name, byte[] image, Restaurant restaurant, Package parent) {
         this.name = name;
         this.image = image;
         this.restaurant = restaurant;
+        this.parent = parent;
     }
 
     public Package() {

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +29,7 @@ public class FoodService {
     }
 
     public Food create(InFoodDTO dto, HttpSession session) throws ExceptionController {
-        if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
+        if (dto.name() == null) throw new ExceptionController(400, "Name not sent!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
         if (dto.description() == null) throw new ExceptionController(400, "Description not sent!");
@@ -58,7 +57,9 @@ public class FoodService {
     }
 
     public Food update(UUID idFood, InFoodDTO dto, HttpSession session) throws ExceptionController {
-        if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
+
+        if (idFood == null) throw new ExceptionController(400, "Food id not sent!");
+        if (dto.name() == null) throw new ExceptionController(400, "Name not sent!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
         if (dto.description() == null) throw new ExceptionController(400, "Description not sent!");
@@ -93,8 +94,8 @@ public class FoodService {
     }
 
     public Food move(UUID idFood, UUID idParent, HttpSession session) throws ExceptionController {
-        if (idFood == null) throw new ExceptionController(400, "Food's id not send!");
-        if (idParent == null) throw new ExceptionController(400, "Parent's id not send!");
+        if (idFood == null) throw new ExceptionController(400, "Food id not sent!");
+        if (idParent == null) throw new ExceptionController(400, "Parent id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
         if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
@@ -124,7 +125,7 @@ public class FoodService {
     }
 
     public Food get(UUID idFood) throws ExceptionController {
-        if (idFood == null) throw new ExceptionController(400, "Food's id not send!");
+        if (idFood == null) throw new ExceptionController(400, "Food id not send!");
         if (!foodDAO.existsById(idFood)) throw new ExceptionController(404, "Alimento não encontrado!");
         return foodDAO.getFoodById(idFood);
     }
@@ -148,6 +149,32 @@ public class FoodService {
         if (idRestaurant == null) return getAll(session);
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
         return foodDAO.getAllByRestaurant(idRestaurant);
+    }
+
+    public void delete(UUID idFood, HttpSession session) throws ExceptionController{
+        if (idFood == null) throw new ExceptionController(400, "Food id not sent!");
+
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+
+        var id = (UUID) session.getAttribute("user");
+
+        if (!restaurantDAO.existsById(id)) {
+            session.removeAttribute("user");
+            throw new ExceptionController(412, "Restaurante não cadastrado!");
+        }
+
+        var restaurant = restaurantDAO.getRestaurantById(id);
+
+        if (!foodDAO.existsById(idFood)) throw new ExceptionController(404, "Alimento não encontrado!");
+
+        var food = foodDAO.getFoodById(idFood);
+
+        if (!food.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar alimentos que não sejam seus!");
+
+        foodDAO.delete(food);
+
+        if (foodDAO.existsById(idFood)) throw new ExceptionController(500, "Erro ao deletar Alimento!");
     }
     
 }

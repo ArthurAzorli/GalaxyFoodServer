@@ -1,6 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.controller;
 
-import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.AddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.ClientService;
@@ -123,7 +123,7 @@ public class ClientController {
     }
 
     @PutMapping("/addaddress")
-    public ResponseEntity<Object> addAddress(@RequestBody InAddressDTO dto, HttpSession session){
+    public ResponseEntity<Object> addAddress(@RequestBody AddressDTO dto, HttpSession session){
         try {
             var client = service.addAddress(dto, session);
             return ResponseEntity.status(201).body(client.toDTO());

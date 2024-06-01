@@ -10,8 +10,12 @@ public interface RestaurantDAO extends JpaRepository<Restaurant, UUID> {
 
     Restaurant getRestaurantById(UUID id);
 
+    Restaurant getRestaurantByEmail(String email);
+
     int countByOwner(RestaurantOwner owner);
 
+    boolean existsRestaurantByEmail(String email);
 
+    boolean existsRestaurantByCnpj(String cnpj);
 
 }
