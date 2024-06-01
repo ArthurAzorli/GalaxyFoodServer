@@ -38,7 +38,7 @@ public class Food extends PackageItem {
     public Food() {
     }
 
-    public OutFoodDTO toDTO(){
-        return  new OutFoodDTO(id, name, price, description ,image, parent.getId());
+    public OutFoodDTO foodToDTO(){
+        return new OutFoodDTO(id, name, price, description ,image, parent.getId());
     }
 }

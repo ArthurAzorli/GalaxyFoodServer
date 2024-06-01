@@ -7,5 +7,5 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Restaurant;
 import java.util.List;
 import java.util.UUID;
 
-public record OutPackageDTO(UUID id, String name, byte[] image, Restaurant restaurant, List<Package> children, List<PackageItem> items) {
+public record OutPackageDTO(UUID id, String name, byte[] image, UUID parent, UUID restaurant, List<OutPackageDTO> children, List<OutPackageItemDTO> items) {
 }

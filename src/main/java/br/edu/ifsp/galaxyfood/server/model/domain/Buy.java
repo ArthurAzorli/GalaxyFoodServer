@@ -1,5 +1,7 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,6 +80,12 @@ public class Buy implements Serializable {
     public boolean addBuyItem(BuyItem buyItem) {
         if (items.contains(buyItem)) return false;
         return items.add(buyItem);
+    }
+
+    public OutBuyDTO toDTO(){
+        List<OutBuyItemDTO> list = new ArrayList<>();
+        for (var item : items) list.add(item.toDTO());
+        return new OutBuyDTO(id, paymentForm, date, sentAddress, client.toDTO(), restaurant.toDTO(), list);
     }
 
 }

@@ -1,5 +1,9 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutComboDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutComboItemDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutFoodDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,4 +64,10 @@ public class Combo extends PackageItem {
         return items.add(item);
     }
 
+
+    public OutComboDTO comboToDTO(){
+        List<OutComboItemDTO> list = new ArrayList<>();
+        for (var item : items) list.add(item.toDTO());
+        return new OutComboDTO(id, name, price, image, parent.getId(), list);
+    }
 }

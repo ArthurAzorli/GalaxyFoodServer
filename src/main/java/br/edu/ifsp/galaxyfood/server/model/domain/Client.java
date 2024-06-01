@@ -1,6 +1,7 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.OutClientDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -101,6 +102,10 @@ public class Client implements Serializable {
 
 
     public OutClientDTO toDTO(){
-        return new OutClientDTO(id, cpf, name, email, birthDate, image, addresses, phones);
+        List<PhoneDTO> listPhones = new ArrayList<>();
+        List<Address> listAddresses = new ArrayList<>();
+        for (var phone : phones) listPhones.add(phone.toDTO());
+        for (var address : addresses) listAddresses.add(address.getAddress());
+        return new OutClientDTO(id, cpf, name, email, birthDate, image, listAddresses, listPhones);
     }
 }

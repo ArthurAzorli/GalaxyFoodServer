@@ -73,7 +73,7 @@ public class RestaurantService {
         return restaurant;
     }
 
-    public Restaurant get(UUID id){
+    public Restaurant get(UUID id) throws ExceptionController{
         if (id == null) throw new ExceptionController(400, "ID not send!");
         if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não cadastrado!");
 
@@ -124,7 +124,7 @@ public class RestaurantService {
         return restaurantDAO.save(restaurant);
     }
 
-    public void changePassword(String oldPassword, String newPassword, HttpSession session){
+    public void changePassword(String oldPassword, String newPassword, HttpSession session) throws ExceptionController{
         if (oldPassword == null || oldPassword.isEmpty()) throw new ExceptionController(400, "Old password not send!");
         if (newPassword == null || newPassword.isEmpty()) throw new ExceptionController(400, "New password not send!");
 
@@ -148,7 +148,7 @@ public class RestaurantService {
         restaurantDAO.save(restaurant);
     }
 
-    public Restaurant addPhone(String phone, HttpSession session){
+    public Restaurant addPhone(String phone, HttpSession session) throws ExceptionController{
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
@@ -171,7 +171,7 @@ public class RestaurantService {
         return restaurantDAO.getRestaurantById(id);
     }
 
-    public Restaurant remPhone(String phone, HttpSession session){
+    public Restaurant remPhone(String phone, HttpSession session) throws ExceptionController{
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");

@@ -1,5 +1,7 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutRestaurantDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -95,6 +97,12 @@ public class Restaurant implements Serializable {
     public boolean addPhone(ClientPhone phone) {
         if (phones.contains(phone)) return false;
         return phones.add(phone);
+    }
+
+    public OutRestaurantDTO toDTO(){
+        List<PhoneDTO> list = new ArrayList<>();
+        for (var phone : phones) list.add(phone.toDTO());
+        return new OutRestaurantDTO(id, cnpj, email, name, specialty, image, score, countScore, address, owner.toDTO(), list);
     }
 
 }

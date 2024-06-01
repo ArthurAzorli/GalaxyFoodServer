@@ -1,5 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +33,10 @@ public abstract class PackageItem implements Serializable {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     protected byte[] image;
+
+    public OutPackageItemDTO toDTO(){
+        return new OutPackageItemDTO(id, name, price, image, parent.getId());
+    }
+
 
 }

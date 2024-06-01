@@ -1,5 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,4 +45,8 @@ public class BuyItem implements Serializable {
     }
 
     public BuyItem() {}
+
+    public OutBuyItemDTO toDTO(){
+        return new OutBuyItemDTO(id, buy.getId(), item.toDTO(), quantity);
+    }
 }

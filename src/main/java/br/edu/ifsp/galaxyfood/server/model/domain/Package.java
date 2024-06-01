@@ -1,5 +1,7 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,5 +78,13 @@ public class Package implements Serializable {
     public boolean addItem(PackageItem item) {
         if (items.contains(item)) return false;
         return items.add(item);
+    }
+
+    public OutPackageDTO toDTO(){
+        List<OutPackageDTO> listPackages = new ArrayList<>();
+        List<OutPackageItemDTO> listItems = new ArrayList<>();
+        for (var pack : children) listPackages.add(pack.toDTO());
+        for (var item : items) listItems.add(item.toDTO());
+        return new OutPackageDTO(id, name, image, parent.getId(), restaurant.getId(), listPackages, listItems);
     }
 }

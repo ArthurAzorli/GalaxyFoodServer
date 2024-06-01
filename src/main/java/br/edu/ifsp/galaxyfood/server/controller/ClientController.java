@@ -65,6 +65,7 @@ public class ClientController {
         try {
             var client = service.get(id);
             return ResponseEntity.status(302).body(client.toDTO());
+
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
@@ -83,9 +84,10 @@ public class ClientController {
     @PutMapping("/update")
     public ResponseEntity<Object> update(@RequestBody InClientDTO dto, HttpSession session){
         try {
-            var client = service.update(dto, session);
 
+            var client = service.update(dto, session);
             return ResponseEntity.status(202).body(client.toDTO());
+
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
@@ -137,7 +139,7 @@ public class ClientController {
     public ResponseEntity<Object> remPhone(@PathVariable("id") String id, HttpSession session){
         try {
             var client = service.remPhone(id, session);
-            return ResponseEntity.status(201).body(client.toDTO());
+            return ResponseEntity.ok(client.toDTO());
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -148,7 +150,7 @@ public class ClientController {
     public ResponseEntity<Object> remAddress(@PathVariable("id") UUID id, HttpSession session){
         try {
             var client = service.remAddress(id, session);
-            return ResponseEntity.status(201).body(client.toDTO());
+            return ResponseEntity.ok(client.toDTO());
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));

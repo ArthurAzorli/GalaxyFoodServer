@@ -1,5 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
+import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,4 +27,8 @@ public class ClientPhone implements Serializable {
     }
 
     public ClientPhone() {}
+
+    public PhoneDTO toDTO() {
+        return new PhoneDTO(phone);
+    }
 }

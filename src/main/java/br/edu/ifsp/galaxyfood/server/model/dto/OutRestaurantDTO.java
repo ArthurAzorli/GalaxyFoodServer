@@ -8,5 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public record OutRestaurantDTO(UUID id, String cnpj, String email, String name, String specialty, byte[] image, BigDecimal score, Address address, RestaurantOwner owner, List<ClientPhone> phones) {
+
+public record OutRestaurantDTO(UUID id, String cnpj, String email, String name, String specialty, byte[] image, BigDecimal score, Integer countScore, Address address, OutRestaurantOwnerDTO owner, List<PhoneDTO> phones) {
 }
