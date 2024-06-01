@@ -2,7 +2,6 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Buy;
 import br.edu.ifsp.galaxyfood.server.model.domain.BuyItem;
-import br.edu.ifsp.galaxyfood.server.model.domain.PaymentForm;
 import br.edu.ifsp.galaxyfood.server.model.dto.InBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;

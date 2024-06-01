@@ -118,16 +118,6 @@ public class RestaurantController {
         }
     }
 
-    @GetMapping("/session")
-    public ResponseEntity<Object> getSession(HttpSession session){
-        var data = new HashMap<String, Object>();
-
-        data.put("user", session.getAttribute("user"));
-        data.put("type", session.getAttribute("type"));
-
-        return ResponseEntity.status(302).body(data);
-    }
-
     @PutMapping("/update")
     public ResponseEntity<Object> update(@RequestBody InRestaurantDTO dto, HttpSession session){
         try {

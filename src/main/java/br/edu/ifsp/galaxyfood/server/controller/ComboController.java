@@ -1,6 +1,7 @@
 package br.edu.ifsp.galaxyfood.server.controller;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.InComboDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.InComboItemDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.OutComboDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.ComboService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
@@ -86,6 +87,27 @@ public class ComboController {
         try {
             var combo = service.move(idCombo, idParent, session);
             return ResponseEntity.status(202).body(combo.comboToDTO());
+
+        } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
+    @PutMapping("/addfood")
+    public ResponseEntity<Object> addFood(InComboItemDTO dto, HttpSession session){
+        try {
+            var combo = service.addFood(dto, session);
+            return ResponseEntity.status(201).body(combo.comboToDTO());
+        } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
+    @DeleteMapping("/remfood/{id}")
+    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+        try {
+            var combo = service.remFood(id, session);
+            return ResponseEntity.ok(combo.comboToDTO());
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
