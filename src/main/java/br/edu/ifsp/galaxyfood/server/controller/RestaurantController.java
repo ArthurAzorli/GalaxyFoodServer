@@ -79,7 +79,7 @@ public class RestaurantController {
         }
     }
 
-    @GetMapping("/get")
+    @GetMapping("/getOfLocal")
     public ResponseEntity<Object> getAll(@RequestParam(value = "address") UUID address, HttpSession session){
         try {
             var restaurants = service.getAllOfLocal(address, session);
@@ -105,7 +105,7 @@ public class RestaurantController {
         }
     }
 
-    @GetMapping("/search")
+    @GetMapping("/searchOfLocal")
     public ResponseEntity<Object> search(@RequestParam(value = "text") String text, @RequestParam(value = "address") UUID address, HttpSession session){
         try {
             var restaurants = service.searchOfLocal(text, address, session);
