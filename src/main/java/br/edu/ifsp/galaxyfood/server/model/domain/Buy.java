@@ -20,7 +20,6 @@ public class Buy implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR")
     private UUID id;
 
     @Column(name = "payment_form", nullable = false)

@@ -14,7 +14,6 @@ public class ClientAddress implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR")
     private UUID id;
 
     @OneToOne(cascade = CascadeType.ALL)

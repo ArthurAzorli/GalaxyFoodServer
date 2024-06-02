@@ -21,7 +21,6 @@ public class Client implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR")
     private UUID id;
 
     @Column(length = 14, unique = true, updatable = false)

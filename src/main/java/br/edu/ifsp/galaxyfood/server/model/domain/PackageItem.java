@@ -17,7 +17,6 @@ public abstract class PackageItem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR")
     protected UUID id;
 
     @Column(nullable = false)

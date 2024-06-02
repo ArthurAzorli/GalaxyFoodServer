@@ -18,7 +18,6 @@ public class RestaurantOwner implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR")
     private UUID id;
 
     @Column(length = 14)
