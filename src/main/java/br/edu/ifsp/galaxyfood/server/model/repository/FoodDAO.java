@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FoodDAO extends JpaRepository<Food, UUID> {
+
+    @Query(value = "SELECT f FROM Food f WHERE f.id = ?1")
     Food getFoodById(UUID id);
 
     @Query(value = "SELECT f FROM Food f, Package p WHERE f.parent.id = p.id AND p.restaurant.id = ?1")

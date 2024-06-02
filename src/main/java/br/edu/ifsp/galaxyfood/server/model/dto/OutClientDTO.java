@@ -1,8 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.dto;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Address;
-import br.edu.ifsp.galaxyfood.server.model.domain.ClientAddress;
-import br.edu.ifsp.galaxyfood.server.model.domain.ClientPhone;
 
 import java.time.LocalDate;
 import java.util.List;

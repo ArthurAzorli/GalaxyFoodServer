@@ -2,8 +2,6 @@ package br.edu.ifsp.galaxyfood.server.model.domain;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.OutComboDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.OutComboItemDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.OutFoodDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageItemDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

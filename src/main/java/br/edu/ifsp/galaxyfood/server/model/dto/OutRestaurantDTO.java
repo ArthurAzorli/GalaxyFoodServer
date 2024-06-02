@@ -1,8 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.dto;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Address;
-import br.edu.ifsp.galaxyfood.server.model.domain.ClientPhone;
-import br.edu.ifsp.galaxyfood.server.model.domain.RestaurantOwner;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface PackageDAO extends JpaRepository<Package, UUID> {
 
+    @Query(value = "SELECT p FROM Package p WHERE p.id = ?1")
     Package getPackageById(UUID id);
 
     @Query(value = "SELECT p FROM Package p WHERE p.restaurant.id = ?1 AND p.parent IS NULL")
