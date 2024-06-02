@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BuyDAO extends JpaRepository<Buy, UUID> {
 
-    @Query(value = "SELECT b FROM Buy WHERE b.id = ?1")
+    @Query(value = "SELECT b FROM Buy b WHERE b.id = ?1")
     Buy getBuyById(UUID id);
 
     @Query(value = "SELECT b FROM Buy b WHERE b.client.id = ?1")

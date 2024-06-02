@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface AddressDAO extends JpaRepository<Address, UUID> {
 
-    @Query(value = "SELECT a FROM Address WHERE a.id = ?1")
+    @Query(value = "SELECT a FROM Address a WHERE a.id = ?1")
     Address getAddressById(UUID id);
 }
