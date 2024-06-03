@@ -157,6 +157,17 @@ public class RestaurantController {
         }
     }
 
+    @PutMapping("/score/{id}")
+    public ResponseEntity<Object> score (@PathVariable("id") UUID idRestaurant,  @RequestBody InScoreDTO dto, HttpSession session){
+        try {
+            var restaurant = service.score(idRestaurant, dto, session);
+            return ResponseEntity.status(202).body(restaurant.toDTO());
+
+        } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
     @DeleteMapping("/remphone/{id}")
     public ResponseEntity<Object> remPhone(@PathVariable("id") String id, HttpSession session){
         try {
