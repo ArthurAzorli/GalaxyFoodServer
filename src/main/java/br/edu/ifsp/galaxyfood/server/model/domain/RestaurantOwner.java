@@ -33,7 +33,7 @@ public class RestaurantOwner implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDate birthDate;
 
-    public RestaurantOwner(String cpf, String rg, String name, LocalDate birthDate) {
+    public RestaurantOwner(String rg, String cpf, String name, LocalDate birthDate) {
         this.cpf = cpf;
         this.rg = rg;
         this.name = name;
