@@ -22,17 +22,14 @@ public class RestaurantService {
 
     private final AddressDAO addressDAO;
 
-    private final RestaurantPhoneDAO phoneDAO;
-
     private final ClientDAO clientDAO;
 
     private final ScoreDAO scoreDAO;
 
-    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO, @NonNull RestaurantPhoneDAO phoneDAO, @NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO) {
+    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO,@NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO) {
         this.restaurantDAO = restaurantDAO;
         this.ownerDAO = ownerDAO;
         this.addressDAO = addressDAO;
-        this.phoneDAO = phoneDAO;
         this.clientDAO = clientDAO;
         this.scoreDAO = scoreDAO;
     }
@@ -88,6 +85,7 @@ public class RestaurantService {
     }
 
     public List<Restaurant> getAll(HttpSession session) throws ExceptionController {
+        if (session.getAttribute("type") == null) throw new ExceptionController(498, "Você não está logado!");
         if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você está logado em uma conta de Restaurante!");
         return restaurantDAO.getAllRestaurant();
     }
@@ -110,10 +108,7 @@ public class RestaurantService {
         var client = clientDAO.getClientById(id);
         var address = addressDAO.getAddressById(idAddress);
 
-        var flag = true;
-        for (var clientAddress : client.getAddresses()) if (clientAddress.getAddress().getId().equals(address.getId())) flag = false;
-
-        if (flag) throw new ExceptionController(401, "Você não pode acessar restaurantes com base de um endereço que não seja seu!");
+        if (!client.getAddresses().contains(address)) throw new ExceptionController(401, "Você não pode acessar restaurantes com base de um endereço que não seja seu!");
 
         return restaurantDAO.getAllOfLocal(address.getCity(), address.getState());
     }
@@ -144,10 +139,7 @@ public class RestaurantService {
         var client = clientDAO.getClientById(id);
         var address = addressDAO.getAddressById(idAddress);
 
-        var flag = true;
-        for (var clientAddress : client.getAddresses()) if (clientAddress.getAddress().getId().equals(address.getId())) flag = false;
-
-        if (flag) throw new ExceptionController(401, "Você não pode pesquisar restaurantes com base de um endereço que não seja seu!");
+        if (!client.getAddresses().contains(address)) throw new ExceptionController(401, "Você não pode pesquisar restaurantes com base de um endereço que não seja seu!");
 
         return restaurantDAO.searchOfLocal(text, address.getCity(), address.getState());
     }
@@ -233,10 +225,9 @@ public class RestaurantService {
 
         var restaurant = restaurantDAO.getRestaurantById(id);
 
-        var newPhone = new RestaurantPhone(phone, restaurant);
-        phoneDAO.save(newPhone);
+        restaurant.addPhone(phone);
 
-        return restaurantDAO.getRestaurantById(id);
+        return  restaurantDAO.save(restaurant);
     }
 
     public Restaurant remPhone(String phone, HttpSession session) throws ExceptionController{
@@ -252,13 +243,13 @@ public class RestaurantService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
-        var selectedPhone = phoneDAO.getRestaurantPhoneByPhone(phone);
         var restaurant = restaurantDAO.getRestaurantById(id);
 
-        if (!selectedPhone.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(409, "Você não pode remover telefonão sejam seus!");
+        if (!restaurant.getPhones().contains(phone)) throw new ExceptionController(404, "Telefone não está cadastrado!");
 
-        phoneDAO.delete(selectedPhone);
-        return restaurantDAO.getRestaurantById(id);
+        restaurant.getPhones().remove(phone);
+
+        return restaurantDAO.save(restaurant);
     }
 
     public Restaurant score(UUID idRestaurant, InScoreDTO dto, HttpSession session) throws ExceptionController{

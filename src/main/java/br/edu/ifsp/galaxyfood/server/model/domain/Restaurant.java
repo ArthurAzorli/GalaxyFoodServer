@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -48,14 +47,13 @@ public class Restaurant implements Serializable {
     @OneToMany
     private List<Score> score = new ArrayList<>();
 
-    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
-    private List<ClientPhone> phones = new ArrayList<>();
+    private List<String> phones = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="owner_id", nullable=false, columnDefinition = "VARCHAR", referencedColumnName = "id")
     private RestaurantOwner owner;
 
-    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, Address address, RestaurantOwner owner, List<Score> score, List<ClientPhone> phones) {
+    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, Address address, RestaurantOwner owner, List<Score> score, List<String> phones) {
         this.id = id;
         this.cnpj = cnpj;
         this.email = email;
@@ -88,14 +86,12 @@ public class Restaurant implements Serializable {
         this.password = Cripto.md5(password);
     }
 
-    public boolean addPhone(ClientPhone phone) {
+    public boolean addPhone(String phone) {
         if (phones.contains(phone)) return false;
         return phones.add(phone);
     }
 
     public OutRestaurantDTO toDTO(){
-        List<PhoneDTO> list = new ArrayList<>();
-        for (var phone : phones) list.add(phone.toDTO());
 
         var sum = 0.0;
         List<OutScoreDTO> scores = new ArrayList<>();
@@ -106,7 +102,7 @@ public class Restaurant implements Serializable {
 
         var score = sum/this.score.size();
 
-        return new OutRestaurantDTO(id, cnpj, email, name, specialty, image, score, scores,  address, owner.toDTO(), list);
+        return new OutRestaurantDTO(id, cnpj, email, name, specialty, image, score, scores,  address, owner.toDTO(), phones);
     }
 
 }

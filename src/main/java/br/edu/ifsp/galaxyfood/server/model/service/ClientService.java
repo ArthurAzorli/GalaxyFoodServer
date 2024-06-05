@@ -2,14 +2,10 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Address;
 import br.edu.ifsp.galaxyfood.server.model.domain.Client;
-import br.edu.ifsp.galaxyfood.server.model.domain.ClientAddress;
-import br.edu.ifsp.galaxyfood.server.model.domain.ClientPhone;
 import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
-import br.edu.ifsp.galaxyfood.server.model.repository.ClientAddressDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientDAO;
-import br.edu.ifsp.galaxyfood.server.model.repository.ClientPhoneDAO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import jakarta.servlet.http.HttpSession;
@@ -23,16 +19,10 @@ public class ClientService {
 
     private final ClientDAO clientDAO;
 
-    private final ClientPhoneDAO clientPhoneDAO;
-
-    private final ClientAddressDAO clientAddressDAO;
-
     private final AddressDAO addressDAO;
 
-    public ClientService(@NonNull ClientDAO clientDAO, @NonNull ClientPhoneDAO clientPhoneDAO, @NonNull ClientAddressDAO clientAddressDAO, @NonNull AddressDAO addressDAO) {
+    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO) {
         this.clientDAO = clientDAO;
-        this.clientPhoneDAO = clientPhoneDAO;
-        this.clientAddressDAO = clientAddressDAO;
         this.addressDAO = addressDAO;
     }
 
@@ -132,14 +122,11 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-        if (clientPhoneDAO.existsById(phone)) throw new ExceptionController(409, "Telefone já está cadastrado!");
-
         var client = clientDAO.getClientById(id);
 
-        var newPhone = new ClientPhone(phone, client);
-        clientPhoneDAO.save(newPhone);
+        if (!client.addPhone(phone)) throw new ExceptionController(409, "Telefone já está cadastrado!");
 
-        return clientDAO.getClientById(id);
+        return clientDAO.save(client);
     }
 
     public Client remPhone(String phone, HttpSession session){
@@ -155,15 +142,13 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-        if (!clientPhoneDAO.existsById(phone)) throw new ExceptionController(409, "Telefone não está cadastrado!");
-
-        var selectedPhone = clientPhoneDAO.getClientPhoneByPhone(phone);
         var client = clientDAO.getClientById(id);
 
-        if (!selectedPhone.getClient().getId().equals(client.getId())) throw new ExceptionController(409, "Telefone não está cadastrado!");
+        if (!client.getPhones().contains(phone)) throw new ExceptionController(404, "Telefone não está cadastrado!");
 
-        clientPhoneDAO.delete(selectedPhone);
-        return clientDAO.getClientById(id);
+        client.getPhones().remove(phone);
+
+        return clientDAO.save(client);
     }
 
     public Client addAddress(InAddressDTO dto, HttpSession session){
@@ -188,21 +173,13 @@ public class ClientService {
 
         var client = clientDAO.getClientById(id);
 
-        for (var clientAddress : client.getAddresses()){
-            if (
-                clientAddress.getAddress().getStreet().equals(address.getStreet()) &&
-                clientAddress.getAddress().getNumber().equals(address.getNumber()) &&
-                clientAddress.getAddress().getNeighborhood().equals(address.getNeighborhood()) &&
-                clientAddress.getAddress().getCity().equals(address.getCity()) &&
-                clientAddress.getAddress().getState().equals(address.getState())
-            ) throw new ExceptionController(409, "Endereço já está cadastrado!");
-        }
+        if (client.getAddresses().contains(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
 
-        var clientAddress = new ClientAddress(client, address);
         addressDAO.save(address);
-        clientAddressDAO.save(clientAddress);
 
-        return clientDAO.getClientById(client.getId());
+        client.addAddress(address);
+
+        return clientDAO.save(client);
     }
 
     public Client remAddress(UUID idAddress, HttpSession session){
@@ -218,19 +195,23 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-        if (!clientAddressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não está cadastrado!");
 
-        var selectedAddress = clientAddressDAO.getAddressById(idAddress);
 
-        if (!addressDAO.existsById(selectedAddress.getId())) throw new ExceptionController(409, "Endereço não está cadastrado!");
+
+
+        if (!addressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não está cadastrado!");
+
+        var address = addressDAO.getAddressById(idAddress);
 
         var client = clientDAO.getClientById(id);
 
-        if (!selectedAddress.getClient().getId().equals(client.getId())) throw new ExceptionController(409, "Telefone não está cadastrado!");
+        if (client.getAddresses().contains(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
 
-        clientAddressDAO.delete(selectedAddress);
-        addressDAO.delete(selectedAddress.getAddress());
-        return clientDAO.getClientById(client.getId());
+        client.getAddresses().remove(address);
+
+        clientDAO.save(client);
+        addressDAO.delete(address);
+        return client;
     }
 
     public void delete(HttpSession session) throws ExceptionController{

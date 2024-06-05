@@ -83,7 +83,8 @@ public class RestaurantOwnerService {
 
         if (restaurantDAO.countByOwner(restaurant.getOwner())>1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
 
-        repository.deleteById(restaurant.getOwner().getId());
+        restaurantDAO.delete(restaurant);
+        repository.delete(restaurant.getOwner());
 
         if (repository.existsById(restaurant.getOwner().getId())) throw new ExceptionController(500, "Erro ao deletar Cliente!");
     }

@@ -43,13 +43,12 @@ public class Client implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<ClientAddress> addresses = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Address> addresses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ClientPhone> phones = new ArrayList<>();
+    private List<String> phones = new ArrayList<>();
 
-    public Client(UUID id, String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<ClientAddress> addresses, List<ClientPhone> phones) {
+    public Client(UUID id, String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<String> phones) {
         this.id = id;
         this.cpf = cpf;
         this.name = name;
@@ -61,7 +60,7 @@ public class Client implements Serializable {
         this.phones = phones;
     }
 
-    public Client(String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<ClientAddress> addresses, List<ClientPhone> phones) {
+    public Client(String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<String> phones) {
         this.id = UUID.randomUUID();
         this.cpf = cpf;
         this.name = name;
@@ -89,22 +88,18 @@ public class Client implements Serializable {
         this.password = Cripto.md5(password);
     }
 
-    public boolean addPhone(ClientPhone phone){
+    public boolean addPhone(String phone){
         if (phones.contains(phone)) return false;
         return phones.add(phone);
     }
 
-    public boolean addAddress(ClientAddress address){
+    public boolean addAddress(Address address){
         if (addresses.contains(address)) return false;
         return addresses.add(address);
     }
 
 
     public OutClientDTO toDTO(){
-        List<PhoneDTO> listPhones = new ArrayList<>();
-        List<Address> listAddresses = new ArrayList<>();
-        for (var phone : phones) listPhones.add(phone.toDTO());
-        for (var address : addresses) listAddresses.add(address.getAddress());
-        return new OutClientDTO(id, cpf, name, email, birthDate, image, listAddresses, listPhones);
+        return new OutClientDTO(id, cpf, name, email, birthDate, image, addresses, phones);
     }
 }
