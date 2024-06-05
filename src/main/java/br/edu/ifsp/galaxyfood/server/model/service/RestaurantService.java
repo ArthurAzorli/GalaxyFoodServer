@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -97,7 +96,7 @@ public class RestaurantService {
         if (idAddress == null) throw new ExceptionController(400, "Address id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -106,7 +105,6 @@ public class RestaurantService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-        if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
         if (!addressDAO.existsById(idAddress)) throw new ExceptionController(404, "Endereço não encontrado!");
 
         var client = clientDAO.getClientById(id);
@@ -132,7 +130,7 @@ public class RestaurantService {
         if (idAddress == null) throw new ExceptionController(400, "Address id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -169,7 +167,7 @@ public class RestaurantService {
 
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -201,7 +199,7 @@ public class RestaurantService {
         if (newPassword == null || newPassword.isEmpty()) throw new ExceptionController(400, "New password not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -224,7 +222,7 @@ public class RestaurantService {
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -232,8 +230,6 @@ public class RestaurantService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
-
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(id);
 
@@ -247,7 +243,7 @@ public class RestaurantService {
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -255,8 +251,6 @@ public class RestaurantService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
-
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
 
         var selectedPhone = phoneDAO.getRestaurantPhoneByPhone(phone);
         var restaurant = restaurantDAO.getRestaurantById(id);
@@ -272,7 +266,7 @@ public class RestaurantService {
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -301,7 +295,7 @@ public class RestaurantService {
 
     public void delete(HttpSession session) throws ExceptionController{
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -309,8 +303,6 @@ public class RestaurantService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
-
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
 
         restaurantDAO.deleteById(id);
 

@@ -44,7 +44,7 @@ public class BuyService {
         if (dto.items() == null|| dto.items().isEmpty()) throw new ExceptionController(400, "Bought Items not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -127,7 +127,7 @@ public class BuyService {
         List<Buy> buys = new ArrayList<>();
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) {
+        if (!session.getAttribute("type").equals("client")) {
 
             var id = (UUID) session.getAttribute("user");
 

@@ -36,7 +36,7 @@ public class FoodService {
         if (dto.parent() == null) throw new ExceptionController(400, "Parent not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -45,7 +45,6 @@ public class FoodService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
         if (!packageDAO.existsById(dto.parent())) throw new ExceptionController(404, "Pasta não encontrada!");
 
         var restaurant = restaurantDAO.getRestaurantById(id);
@@ -65,7 +64,7 @@ public class FoodService {
         if (dto.description() == null) throw new ExceptionController(400, "Description not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -73,8 +72,6 @@ public class FoodService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
-
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(id);
 
@@ -98,7 +95,7 @@ public class FoodService {
         if (idParent == null) throw new ExceptionController(400, "Parent id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -107,7 +104,6 @@ public class FoodService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
-        if (!restaurantDAO.existsById(id)) throw new ExceptionController(404, "Restaurante não encontrado!");
         if (!packageDAO.existsById(idParent)) throw new ExceptionController(404, "Pasta não encontrada!");
 
         var restaurant = restaurantDAO.getRestaurantById(id);
@@ -133,7 +129,7 @@ public class FoodService {
     public List<Food> getAll(HttpSession session) {
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -155,7 +151,7 @@ public class FoodService {
         if (idFood == null) throw new ExceptionController(400, "Food id not sent!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var id = (UUID) session.getAttribute("user");
 

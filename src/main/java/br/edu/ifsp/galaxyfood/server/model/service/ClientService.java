@@ -78,7 +78,7 @@ public class ClientService {
         if (dto.email() == null) throw new ExceptionController(400, "Email not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -86,8 +86,6 @@ public class ClientService {
             session.removeAttribute("user");
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
-
-        if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
 
         var client = clientDAO.getClientById(id);
         client.setName(dto.name());
@@ -102,7 +100,7 @@ public class ClientService {
         if (newPassword == null || newPassword.isEmpty()) throw new ExceptionController(400, "New password not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -124,8 +122,8 @@ public class ClientService {
     public Client addPhone(String phone, HttpSession session){
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
-        if(session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -147,8 +145,8 @@ public class ClientService {
     public Client remPhone(String phone, HttpSession session){
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
-        if(session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -178,8 +176,8 @@ public class ClientService {
 
         var address = new Address(dto.street(), dto.number(), dto.neighborhood(), dto.city(), dto.state(), dto.cep());
 
-        if(session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -210,8 +208,8 @@ public class ClientService {
     public Client remAddress(UUID idAddress, HttpSession session){
         if (idAddress == null) throw new ExceptionController(400, "Address id not send!");
 
-        if(session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 
@@ -236,8 +234,8 @@ public class ClientService {
     }
 
     public void delete(HttpSession session) throws ExceptionController{
-        if(session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
         var id = (UUID) session.getAttribute("user");
 

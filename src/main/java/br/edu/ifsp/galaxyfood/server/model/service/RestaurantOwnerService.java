@@ -50,7 +50,7 @@ public class RestaurantOwnerService {
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
         var idRestaurant = (UUID) session.getAttribute("user");
 
@@ -70,7 +70,7 @@ public class RestaurantOwnerService {
 
     public void delete(HttpSession session) throws ExceptionController{
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurant!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurant!");
 
         var idRestaurant = (UUID) session.getAttribute("user");
 

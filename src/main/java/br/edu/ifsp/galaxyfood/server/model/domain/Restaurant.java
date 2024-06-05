@@ -46,7 +46,7 @@ public class Restaurant implements Serializable {
     private Address address;
 
     @OneToMany
-    private List<Score> score;
+    private List<Score> score = new ArrayList<>();
 
     @OneToMany(mappedBy = "phone", cascade = CascadeType.ALL)
     private List<ClientPhone> phones = new ArrayList<>();
