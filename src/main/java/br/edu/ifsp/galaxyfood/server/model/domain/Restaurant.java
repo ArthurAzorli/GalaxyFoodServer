@@ -2,7 +2,6 @@ package br.edu.ifsp.galaxyfood.server.model.domain;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.OutRestaurantDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.OutScoreDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -41,19 +40,20 @@ public class Restaurant implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     private Address address;
 
     @OneToMany
     private List<Score> score = new ArrayList<>();
 
-    private List<String> phones = new ArrayList<>();
+    @OneToMany
+    private List<Phone> phones = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="owner_id", nullable=false, columnDefinition = "VARCHAR", referencedColumnName = "id")
     private RestaurantOwner owner;
 
-    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, Address address, RestaurantOwner owner, List<Score> score, List<String> phones) {
+    public Restaurant(UUID id, String cnpj, String email, String name, String specialty, byte[] image, String password, Address address, RestaurantOwner owner, List<Score> score, List<Phone> phones) {
         this.id = id;
         this.cnpj = cnpj;
         this.email = email;
@@ -86,7 +86,7 @@ public class Restaurant implements Serializable {
         this.password = Cripto.md5(password);
     }
 
-    public boolean addPhone(String phone) {
+    public boolean addPhone(Phone phone) {
         if (phones.contains(phone)) return false;
         return phones.add(phone);
     }

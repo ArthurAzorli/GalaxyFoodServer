@@ -94,7 +94,7 @@ public class ClientController {
     }
 
     @PutMapping("/addphone")
-    public ResponseEntity<Object> addPhone(@RequestBody PhoneDTO dto, HttpSession session){
+    public ResponseEntity<Object> addPhone(@RequestBody InPhoneDTO dto, HttpSession session){
         try {
             var client = service.addPhone(dto.phone(), session);
             return ResponseEntity.status(201).body(client.toDTO());
@@ -116,7 +116,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/remphone/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") String id, HttpSession session){
+    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
         try {
             var client = service.remPhone(id, session);
             return ResponseEntity.ok(client.toDTO());

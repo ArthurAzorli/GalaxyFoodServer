@@ -2,10 +2,12 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Address;
 import br.edu.ifsp.galaxyfood.server.model.domain.Client;
+import br.edu.ifsp.galaxyfood.server.model.domain.Phone;
 import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientDAO;
+import br.edu.ifsp.galaxyfood.server.model.repository.PhoneDAO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import jakarta.servlet.http.HttpSession;
@@ -21,9 +23,12 @@ public class ClientService {
 
     private final AddressDAO addressDAO;
 
-    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO) {
+    private final PhoneDAO phoneDAO;
+
+    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO, @NonNull PhoneDAO phoneDAO) {
         this.clientDAO = clientDAO;
         this.addressDAO = addressDAO;
+        this.phoneDAO = phoneDAO;
     }
 
     public Client login(String login, String password) throws ExceptionController {
@@ -124,13 +129,16 @@ public class ClientService {
 
         var client = clientDAO.getClientById(id);
 
-        if (!client.addPhone(phone)) throw new ExceptionController(409, "Telefone já está cadastrado!");
+        var newPhone = new Phone(phone);
 
+        if (!client.addPhone(newPhone)) throw new ExceptionController(409, "Telefone já está cadastrado!");
+
+        phoneDAO.save(newPhone);
         return clientDAO.save(client);
     }
 
-    public Client remPhone(String phone, HttpSession session){
-        if (phone == null) throw new ExceptionController(400, "Phone not send!");
+    public Client remPhone(UUID idPhone, HttpSession session){
+        if (idPhone == null) throw new ExceptionController(400, "Phone not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
         if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
@@ -142,13 +150,18 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
+        if (!phoneDAO.existsById(idPhone)) throw new ExceptionController(404, "Telefone não encontrado!");
+
+        var phone = phoneDAO.getPhoneById(idPhone);
         var client = clientDAO.getClientById(id);
 
         if (!client.getPhones().contains(phone)) throw new ExceptionController(404, "Telefone não está cadastrado!");
 
         client.getPhones().remove(phone);
+        client =  clientDAO.save(client);
+        phoneDAO.delete(phone);
 
-        return clientDAO.save(client);
+        return client;
     }
 
     public Client addAddress(InAddressDTO dto, HttpSession session){
@@ -227,6 +240,10 @@ public class ClientService {
 
         if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
 
+        var client = clientDAO.getClientById(id);
+
+        phoneDAO.deleteAll(client.getPhones());
+        addressDAO.deleteAll(client.getAddresses());
         clientDAO.deleteById(id);
 
         if (clientDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Cliente!");

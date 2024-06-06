@@ -147,7 +147,7 @@ public class RestaurantController {
     }
 
     @PutMapping("/addphone")
-    public ResponseEntity<Object> addPhone(@RequestBody PhoneDTO dto, HttpSession session){
+    public ResponseEntity<Object> addPhone(@RequestBody InPhoneDTO dto, HttpSession session){
         try {
             var restaurant = service.addPhone(dto.phone(), session);
             return ResponseEntity.status(201).body(restaurant.toDTO());
@@ -169,7 +169,7 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/remphone/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") String id, HttpSession session){
+    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
         try {
             var restaurant = service.remPhone(id, session);
             return ResponseEntity.ok(restaurant.toDTO());

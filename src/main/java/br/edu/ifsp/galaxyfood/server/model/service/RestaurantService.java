@@ -26,12 +26,15 @@ public class RestaurantService {
 
     private final ScoreDAO scoreDAO;
 
-    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO,@NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO) {
+    private final PhoneDAO phoneDAO;
+
+    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO, @NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO, @NonNull PhoneDAO phoneDAO) {
         this.restaurantDAO = restaurantDAO;
         this.ownerDAO = ownerDAO;
         this.addressDAO = addressDAO;
         this.clientDAO = clientDAO;
         this.scoreDAO = scoreDAO;
+        this.phoneDAO = phoneDAO;
     }
 
     public Restaurant login(String login, String password) throws ExceptionController {
@@ -224,14 +227,16 @@ public class RestaurantService {
         }
 
         var restaurant = restaurantDAO.getRestaurantById(id);
+        var newPhone = new Phone(phone);
 
-        restaurant.addPhone(phone);
+        if (!restaurant.addPhone(newPhone)) throw new ExceptionController(409, "Telafone já cadastrado!");
 
+        phoneDAO.save(newPhone);
         return  restaurantDAO.save(restaurant);
     }
 
-    public Restaurant remPhone(String phone, HttpSession session) throws ExceptionController{
-        if (phone == null) throw new ExceptionController(400, "Phone not send!");
+    public Restaurant remPhone(UUID idPhone, HttpSession session) throws ExceptionController{
+        if (idPhone == null) throw new ExceptionController(400, "Phone id not send!");
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
         if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
@@ -243,13 +248,18 @@ public class RestaurantService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
+        if (!phoneDAO.existsById(idPhone)) throw  new ExceptionController(404, "Telefone não encontrado|!");
+
         var restaurant = restaurantDAO.getRestaurantById(id);
+        var phone = phoneDAO.getPhoneById(idPhone);
 
         if (!restaurant.getPhones().contains(phone)) throw new ExceptionController(404, "Telefone não está cadastrado!");
 
         restaurant.getPhones().remove(phone);
+        restaurant = restaurantDAO.save(restaurant);
+        phoneDAO.delete(phone);
 
-        return restaurantDAO.save(restaurant);
+        return restaurant;
     }
 
     public Restaurant score(UUID idRestaurant, InScoreDTO dto, HttpSession session) throws ExceptionController{
@@ -295,6 +305,9 @@ public class RestaurantService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
+        var restaurant = restaurantDAO.getRestaurantById(id);
+        addressDAO.delete(restaurant.getAddress());
+        phoneDAO.deleteAll(restaurant.getPhones());
         restaurantDAO.deleteById(id);
 
         if (restaurantDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Restaurante!");

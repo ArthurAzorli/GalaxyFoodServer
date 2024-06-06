@@ -1,7 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.model.domain;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.OutClientDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.PhoneDTO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,12 +42,13 @@ public class Client implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     private List<Address> addresses = new ArrayList<>();
 
-    private List<String> phones = new ArrayList<>();
+    @OneToMany
+    private List<Phone> phones = new ArrayList<>();
 
-    public Client(UUID id, String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<String> phones) {
+    public Client(UUID id, String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<Phone> phones) {
         this.id = id;
         this.cpf = cpf;
         this.name = name;
@@ -60,7 +60,7 @@ public class Client implements Serializable {
         this.phones = phones;
     }
 
-    public Client(String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<String> phones) {
+    public Client(String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<Phone> phones) {
         this.id = UUID.randomUUID();
         this.cpf = cpf;
         this.name = name;
@@ -88,7 +88,7 @@ public class Client implements Serializable {
         this.password = Cripto.md5(password);
     }
 
-    public boolean addPhone(String phone){
+    public boolean addPhone(Phone phone){
         if (phones.contains(phone)) return false;
         return phones.add(phone);
     }
