@@ -31,8 +31,10 @@ public interface RestaurantDAO extends JpaRepository<Restaurant, UUID> {
     @Query(value = "SELECT COUNT(r) FROM Restaurant r WHERE r.owner = ?1")
     int countByOwner(RestaurantOwner owner);
 
+    @Query(value = "SELECT case when count(r)> 0 then true else false end FROM Restaurant r WHERE r.email = ?1")
     boolean existsRestaurantByEmail(String email);
 
+    @Query(value = "SELECT case when count(r)> 0 then true else false end FROM Restaurant r WHERE r.cnpj = ?1")
     boolean existsRestaurantByCnpj(String cnpj);
 
 }

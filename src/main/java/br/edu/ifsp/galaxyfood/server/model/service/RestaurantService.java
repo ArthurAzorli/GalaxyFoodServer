@@ -230,6 +230,7 @@ public class RestaurantService {
         var newPhone = new Phone(phone);
 
         if (!restaurant.addPhone(newPhone)) throw new ExceptionController(409, "Telafone já cadastrado!");
+        if (phoneDAO.existsByPhone(phone)) throw new ExceptionController(409, "Telefone cadastrdo em outro Usuário!");
 
         phoneDAO.save(newPhone);
         return  restaurantDAO.save(restaurant);

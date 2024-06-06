@@ -8,8 +8,10 @@ import java.util.UUID;
 
 public interface ClientDAO extends JpaRepository<Client, UUID> {
 
+    @Query(value = "SELECT case when count(c)> 0 then true else false end FROM Client c WHERE c.cpf = ?1")
     boolean existsClientByCpf(String cpf);
 
+    @Query(value = "SELECT case when count(c)> 0 then true else false end FROM Client c WHERE c.email = ?1")
     boolean existsClientByEmail(String email);
 
     @Query(value = "SELECT c FROM Client c WHERE c.email = ?1")

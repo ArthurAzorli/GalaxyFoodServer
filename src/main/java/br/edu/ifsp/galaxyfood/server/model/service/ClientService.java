@@ -132,6 +132,7 @@ public class ClientService {
         var newPhone = new Phone(phone);
 
         if (!client.addPhone(newPhone)) throw new ExceptionController(409, "Telefone já está cadastrado!");
+        if (phoneDAO.existsByPhone(phone)) throw new ExceptionController(409, "Telefone cadastrdo em outro Usuário!");
 
         phoneDAO.save(newPhone);
         return clientDAO.save(client);
@@ -186,12 +187,9 @@ public class ClientService {
 
         var client = clientDAO.getClientById(id);
 
-        if (client.getAddresses().contains(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
+        if (!client.addAddress(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
 
         addressDAO.save(address);
-
-        client.addAddress(address);
-
         return clientDAO.save(client);
     }
 
