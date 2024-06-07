@@ -206,10 +206,6 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-
-
-
-
         if (!addressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não está cadastrado!");
 
         var address = addressDAO.getAddressById(idAddress);
