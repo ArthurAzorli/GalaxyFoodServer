@@ -72,12 +72,8 @@ public class RestaurantService {
         if (!ownerDAO.existsById(dto.owner())) throw new ExceptionController(404, "Dono não encontrado!");
 
         var owner = ownerDAO.getOwnerById(dto.owner());
-        var address = new Address(dto.address().street(), dto.address().number(), dto.address().neighborhood(), dto.address().city(), dto.address().state(), dto.address().cep());
-        var restaurant = restaurantDAO.save(new Restaurant(dto.cnpj(), dto.email(), dto.name(), dto.specialty(), dto.image(), dto.password(), address, owner));
-
-        addressDAO.save(address);
-
-        return restaurant;
+        var address = addressDAO.save(new Address(dto.address().street(), dto.address().number(), dto.address().neighborhood(), dto.address().city(), dto.address().state(), dto.address().cep()));;
+        return restaurantDAO.save(new Restaurant(dto.cnpj(), dto.email(), dto.name(), dto.specialty(), dto.image(), dto.password(), address, owner));
     }
 
     public Restaurant get(UUID id) throws ExceptionController{
@@ -120,7 +116,7 @@ public class RestaurantService {
         if (text == null) throw new ExceptionController(400, "Search text not sent!");
         if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você está logado em uma conta de Restaurante!");
 
-        return restaurantDAO.search(text);
+        return restaurantDAO.search(text.toLowerCase());
     }
 
     public List<Restaurant> searchOfLocal(String text, UUID idAddress, HttpSession session){
@@ -144,7 +140,7 @@ public class RestaurantService {
 
         if (!client.getAddresses().contains(address)) throw new ExceptionController(401, "Você não pode pesquisar restaurantes com base de um endereço que não seja seu!");
 
-        return restaurantDAO.searchOfLocal(text, address.getCity(), address.getState());
+        return restaurantDAO.searchOfLocal(text.toLowerCase(), address.getCity(), address.getState());
     }
 
     public Restaurant update(InRestaurantDTO dto, HttpSession session) throws ExceptionController{

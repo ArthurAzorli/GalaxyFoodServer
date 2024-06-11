@@ -187,9 +187,14 @@ public class ClientService {
 
         var client = clientDAO.getClientById(id);
 
-        if (!client.addAddress(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
+        address = addressDAO.save(address);
 
-        addressDAO.save(address);
+        if (!client.addAddress(address)) {
+            addressDAO.delete(address);
+            throw new ExceptionController(409, "Endereço já está cadastrado!");
+        }
+
+
         return clientDAO.save(client);
     }
 
@@ -206,13 +211,13 @@ public class ClientService {
             throw new ExceptionController(412, "Cliente não cadastrado!");
         }
 
-        if (!addressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não está cadastrado!");
+        if (!addressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não encontrado!");
 
         var address = addressDAO.getAddressById(idAddress);
 
         var client = clientDAO.getClientById(id);
 
-        if (client.getAddresses().contains(address)) throw new ExceptionController(409, "Enderço já está cadstrado!");
+        if (!client.getAddresses().contains(address)) throw new ExceptionController(409, "Enderço não está cadstrado!");
 
         client.getAddresses().remove(address);
 
