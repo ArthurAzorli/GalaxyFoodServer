@@ -177,7 +177,15 @@ public class ComboService {
         if (!food.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos que não sejam seus!");
         if (dto.quantity()<=0) throw new ExceptionController(406, "Quantidade inválida!");
 
-        itemDAO.save(new ComboItem(dto.quantity(), food, combo));
+        if (itemDAO.existsByParams(combo, food)){
+            var item = itemDAO.getComboItemByParams(combo, food);
+            item.setQuantity(dto.quantity());
+            itemDAO.save(item);
+        } else {
+            var item = itemDAO.save(new ComboItem(dto.quantity(), food, combo));
+            combo.addItem(item);
+            comboDAO.save(combo);
+        }
 
         return comboDAO.getComboById(dto.combo());
     }
@@ -199,12 +207,16 @@ public class ComboService {
         if (!itemDAO.existsById(idItem)) throw new ExceptionController(404, "Alimento do combo não encontrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(id);
-        var item = itemDAO.getComboItemById(id);
+        var item = itemDAO.getComboItemById(idItem);
 
         if (!item.getCombo().getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode remover alimentos de combos que não sejam seus!");
 
+        var combo = comboDAO.getComboById(item.getCombo().getId());
+        combo.getItems().remove(item);
+        combo = comboDAO.save(combo);
+
         itemDAO.delete(item);
-        return comboDAO.getComboById(item.getCombo().getId());
+        return combo;
     }
 
     public void delete(UUID idCombo, HttpSession session) throws ExceptionController{
@@ -228,6 +240,7 @@ public class ComboService {
 
         if (!combo.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar combos que não sejam seus!");
 
+        itemDAO.deleteAll(combo.getItems());
         comboDAO.delete(combo);
 
         if (comboDAO.existsById(idCombo)) throw new ExceptionController(500, "Erro ao deletar Combo!");

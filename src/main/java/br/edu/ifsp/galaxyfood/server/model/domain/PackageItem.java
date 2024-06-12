@@ -25,7 +25,7 @@ public abstract class PackageItem implements Serializable {
     @Column(nullable = false, columnDefinition = "DECIMAL")
     protected BigDecimal price;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "parent_package", referencedColumnName = "id", nullable = false)
     protected Package parent;
 
