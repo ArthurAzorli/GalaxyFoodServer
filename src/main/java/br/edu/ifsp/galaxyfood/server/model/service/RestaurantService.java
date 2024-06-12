@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -114,7 +115,7 @@ public class RestaurantService {
 
     public List<Restaurant> search(String text, HttpSession session) throws ExceptionController {
         if (text == null) throw new ExceptionController(400, "Search text not sent!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você está logado em uma conta de Restaurante!");
+        if (session.getAttribute("type") != null && session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você está logado em uma conta de Restaurante!");
 
         return restaurantDAO.search(text.toLowerCase());
     }
@@ -284,11 +285,11 @@ public class RestaurantService {
             return restaurantDAO.getRestaurantById(restaurant.getId());
         }
 
-        var score = new Score(dto.score(), client, restaurant);
+        var score = scoreDAO.save(new Score(dto.score(), client, restaurant));
 
-        scoreDAO.save(score);
+        restaurant.getScore().add(score);
 
-        return restaurantDAO.getRestaurantById(restaurant.getId());
+        return restaurantDAO.save(restaurant);
     }
 
     public void delete(HttpSession session) throws ExceptionController{
@@ -303,8 +304,7 @@ public class RestaurantService {
         }
 
         var restaurant = restaurantDAO.getRestaurantById(id);
-        addressDAO.delete(restaurant.getAddress());
-        phoneDAO.deleteAll(restaurant.getPhones());
+
         restaurantDAO.deleteById(id);
 
         if (restaurantDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Restaurante!");

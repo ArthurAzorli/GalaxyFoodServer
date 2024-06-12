@@ -6,6 +6,7 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Phone;
 import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
+import br.edu.ifsp.galaxyfood.server.model.repository.BuyDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.PhoneDAO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
@@ -25,10 +27,13 @@ public class ClientService {
 
     private final PhoneDAO phoneDAO;
 
-    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO, @NonNull PhoneDAO phoneDAO) {
+    private final BuyDAO buyDAO;
+
+    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO, @NonNull PhoneDAO phoneDAO, @NonNull BuyDAO buyDAO) {
         this.clientDAO = clientDAO;
         this.addressDAO = addressDAO;
         this.phoneDAO = phoneDAO;
+        this.buyDAO = buyDAO;
     }
 
     public Client login(String login, String password) throws ExceptionController {
@@ -239,10 +244,6 @@ public class ClientService {
 
         if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
 
-        var client = clientDAO.getClientById(id);
-
-        phoneDAO.deleteAll(client.getPhones());
-        addressDAO.deleteAll(client.getAddresses());
         clientDAO.deleteById(id);
 
         if (clientDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Cliente!");

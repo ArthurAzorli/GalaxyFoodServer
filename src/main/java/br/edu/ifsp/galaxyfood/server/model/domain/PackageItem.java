@@ -22,7 +22,7 @@ public abstract class PackageItem implements Serializable {
     @Column(nullable = false)
     protected String name;
 
-    @Column(nullable = false, columnDefinition = "DECIMAL")
+    @Column(nullable = false, columnDefinition = "DECIMAL(7,2)")
     protected BigDecimal price;
 
     @ManyToOne

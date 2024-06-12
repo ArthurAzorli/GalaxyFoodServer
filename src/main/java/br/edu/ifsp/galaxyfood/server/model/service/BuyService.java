@@ -59,7 +59,7 @@ public class BuyService {
 
         var client = clientDAO.getClientById(id);
         var restaurant = restaurantDAO.getRestaurantById(dto.restaurant());
-        var address = addressDAO.getReferenceById(dto.sentAddress());
+        var address = addressDAO.getAddressById(dto.sentAddress());
         var date = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         var buy = new Buy(dto.paymentForm(), date, address, client, restaurant);
@@ -69,7 +69,7 @@ public class BuyService {
             if (itemDTO.idItem() == null) throw new ExceptionController(400, "Package item id not sent!");
             if (itemDTO.quantity() == null) throw new ExceptionController(400, "Quantity not sent!");
 
-            if (packageItemDAO.existsById(itemDTO.idItem())) throw new ExceptionController(404, "Produto não encontrado!");
+            if (!packageItemDAO.existsById(itemDTO.idItem())) throw new ExceptionController(404, "Produto não encontrado!");
             if (itemDTO.quantity() <= 0) throw new ExceptionController(406, "Quantidade inválida!");
 
             var item = packageItemDAO.getPackageItemById(itemDTO.idItem());
@@ -103,7 +103,7 @@ public class BuyService {
 
             var client = clientDAO.getClientById(id);
 
-            if (buy.getClient().getId().equals(client.getId())) throw new ExceptionController(401, "Você não pode acessar compras que não sejam suas!");
+            if (!buy.getClient().getId().equals(client.getId())) throw new ExceptionController(401, "Você não pode acessar compras que não sejam suas!");
 
         } else if (session.getAttribute("type").equals("restaurant")){
 
@@ -116,7 +116,7 @@ public class BuyService {
 
             var restaurant = restaurantDAO.getRestaurantById(id);
 
-            if (buy.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode acessar compras que tenham seus produtos!");
+            if (!buy.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode acessar compras que tenham seus produtos!");
         }
 
         return buy;
@@ -127,7 +127,7 @@ public class BuyService {
         List<Buy> buys = new ArrayList<>();
 
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) {
+        if (session.getAttribute("type").equals("client")) {
 
             var id = (UUID) session.getAttribute("user");
 

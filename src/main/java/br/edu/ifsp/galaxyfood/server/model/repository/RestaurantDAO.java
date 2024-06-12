@@ -25,7 +25,7 @@ public interface RestaurantDAO extends JpaRepository<Restaurant, UUID> {
     @Query(value = "SELECT r FROM Restaurant r WHERE lower(r.name) LIKE %?1% OR lower(r.specialty) LIKE %?1% OR lower(r.cnpj) LIKE %?1%")
     List<Restaurant> search(String text);
 
-    @Query(value = "SELECT r FROM Restaurant r WHERE r.address.state = ?2 AND r.address.city = ?3 AND (lower(r.name) LIKE %?1% OR lower(r.specialty) LIKE %?1% OR lower(r.cnpj) LIKE %?1%)")
+    @Query(value = "SELECT r FROM Restaurant r WHERE r.address.city = ?2 AND r.address.state = ?3  AND (lower(r.name) LIKE %?1% OR lower(r.specialty) LIKE %?1% OR lower(r.cnpj) LIKE %?1%)")
     List<Restaurant> searchOfLocal(String text, String city, String state);
 
     @Query(value = "SELECT COUNT(r) FROM Restaurant r WHERE r.owner = ?1")

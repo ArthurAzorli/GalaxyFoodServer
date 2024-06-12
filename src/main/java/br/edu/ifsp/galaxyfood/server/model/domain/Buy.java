@@ -2,6 +2,7 @@ package br.edu.ifsp.galaxyfood.server.model.domain;
 
 import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyItemDTO;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,16 +31,16 @@ public class Buy implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime date;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sent_address", nullable = false, referencedColumnName = "id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "sent_address", nullable = true)
     private Address sentAddress;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "client_id", nullable = false, referencedColumnName = "id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "client_id")
     private Client client;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "restaurant_id", nullable = false, referencedColumnName = "id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @ManyToMany(mappedBy = "buy", cascade = CascadeType.ALL)
@@ -84,7 +85,7 @@ public class Buy implements Serializable {
     public OutBuyDTO toDTO(){
         List<OutBuyItemDTO> list = new ArrayList<>();
         for (var item : items) list.add(item.toDTO());
-        return new OutBuyDTO(id, paymentForm, date, sentAddress, client.toDTO(), restaurant.toDTO(), list);
+        return new OutBuyDTO(id, paymentForm.getCode(), date, sentAddress, client.toDTO(), restaurant.toDTO(), list);
     }
 
 }

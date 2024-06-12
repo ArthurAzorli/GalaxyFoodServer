@@ -43,10 +43,10 @@ public class Restaurant implements Serializable {
     @OneToOne
     private Address address;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Score> score = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Phone> phones = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -100,7 +100,9 @@ public class Restaurant implements Serializable {
             sum += s.getScore().doubleValue();
         }
 
-        var score = sum/this.score.size();
+        double score;
+        if (!this.score.isEmpty()) score = sum/this.score.size();
+        else score = 0.0;
 
         return new OutRestaurantDTO(id, cnpj, email, name, specialty, image, score, scores,  address, owner.toDTO(), phones);
     }
