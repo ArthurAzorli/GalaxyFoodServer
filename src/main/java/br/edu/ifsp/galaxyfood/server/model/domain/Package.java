@@ -27,18 +27,18 @@ public class Package implements Serializable {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false, referencedColumnName = "id")
     private Restaurant restaurant;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "parent_package", referencedColumnName = "id")
     private Package parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Package> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<PackageItem> items = new ArrayList<>();
 
     public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {
@@ -84,6 +84,11 @@ public class Package implements Serializable {
         List<OutPackageItemDTO> listItems = new ArrayList<>();
         for (var pack : children) listPackages.add(pack.toDTO());
         for (var item : items) listItems.add(item.toDTO());
-        return new OutPackageDTO(id, name, image, parent.getId(), restaurant.getId(), listPackages, listItems);
+
+        UUID parent;
+        if (this.parent == null) parent = null;
+        else parent = this.parent.getId();
+
+        return new OutPackageDTO(id, name, image, parent, restaurant.getId(), listPackages, listItems);
     }
 }

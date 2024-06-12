@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -173,9 +174,27 @@ public class PackageService {
         var selectedPackage = packageDAO.getPackageById(idPackage);
 
         if (!selectedPackage.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode deletar pastas que não sejam suas!");
+        if (selectedPackage.getParent() == null) throw new ExceptionController(401, "Você não pode deltar a pasta principal!");
 
+        var internalPackages = recursiveSeek(selectedPackage).reversed();
+
+        packageDAO.deleteAll(internalPackages);
         packageDAO.delete(selectedPackage);
 
         if (packageDAO.existsById(selectedPackage.getId())) throw new ExceptionController(500, "Erro ao deletar Pasta!");
     }
+
+    private List<Package> recursiveSeek(Package parent){
+        List<Package> list = new ArrayList<>();
+
+        if (!parent.getItems().isEmpty()) throw new ExceptionController(401, "Você não pode deletar uma pasta com produtos dentro!");
+        for (var pack : parent.getChildren()){
+            list.add(pack);
+            if (!pack.getChildren().isEmpty()) list.addAll(recursiveSeek(pack));
+        }
+
+        return list;
+    }
 }
+
+

@@ -50,7 +50,7 @@ public class FoodService {
         var restaurant = restaurantDAO.getRestaurantById(id);
         var parent = packageDAO.getPackageById(dto.parent());
 
-        if (parent.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos em uma pasta que não seja sua!");
+        if (!parent.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos em uma pasta que não seja sua!");
 
         return foodDAO.save(new Food(dto.name(), dto.price(), dto.description(), dto.image(), parent));
     }

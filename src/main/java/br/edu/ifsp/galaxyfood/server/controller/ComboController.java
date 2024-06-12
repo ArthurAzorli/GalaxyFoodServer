@@ -94,7 +94,7 @@ public class ComboController {
     }
 
     @PutMapping("/addfood")
-    public ResponseEntity<Object> addFood(InComboItemDTO dto, HttpSession session){
+    public ResponseEntity<Object> addFood(@RequestBody InComboItemDTO dto, HttpSession session){
         try {
             var combo = service.addFood(dto, session);
             return ResponseEntity.status(201).body(combo.comboToDTO());
