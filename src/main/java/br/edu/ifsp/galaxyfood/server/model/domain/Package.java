@@ -27,18 +27,18 @@ public class Package implements Serializable {
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "restaurant_id", nullable = false, referencedColumnName = "id")
     private Restaurant restaurant;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "parent_package", referencedColumnName = "id")
     private Package parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     private List<Package> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     private List<PackageItem> items = new ArrayList<>();
 
     public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {

@@ -21,11 +21,11 @@ public class BuyItem implements Serializable {
     @Column(nullable = false)
     private int quantity;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "item_id", nullable = false)
     private PackageItem item;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "buy_id", nullable = false)
     private Buy buy;
 

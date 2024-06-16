@@ -31,19 +31,20 @@ public class Buy implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime date;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "sent_address", nullable = true)
     private Address sentAddress;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ManyToMany(mappedBy = "buy", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "buy", cascade = CascadeType.REMOVE)
+
     private List<BuyItem> items = new ArrayList<>();
 
     public Buy(UUID id, PaymentForm paymentForm, LocalDateTime date, Address sentAddress, Client client, Restaurant restaurant, List<BuyItem> items) {
