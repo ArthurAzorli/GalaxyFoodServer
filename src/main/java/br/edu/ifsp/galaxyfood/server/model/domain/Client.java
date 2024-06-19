@@ -42,10 +42,10 @@ public class Client implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToMany(orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REMOVE , orphanRemoval = true)
     private List<Address> addresses = new ArrayList<>();
 
-    @OneToMany(orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Phone> phones = new ArrayList<>();
 
     public Client(UUID id, String cpf, String name, String email, LocalDate birthDate, byte[] image, String password, List<Address> addresses, List<Phone> phones) {

@@ -40,7 +40,7 @@ public class Restaurant implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Address address;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
