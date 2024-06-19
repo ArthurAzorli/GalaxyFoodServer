@@ -26,12 +26,15 @@ public class ComboService {
 
     private final ComboDAO comboDAO;
 
-    public ComboService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO, @NonNull ComboItemDAO itemDAO,  @NonNull ComboDAO comboDAO) {
+    private final BuyItemDAO buyItemDAO;
+
+    public ComboService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO, @NonNull ComboItemDAO itemDAO, @NonNull ComboDAO comboDAO, @NonNull BuyItemDAO buyItemDAO) {
         this.restaurantDAO = restaurantDAO;
         this.packageDAO = packageDAO;
         this.foodDAO = foodDAO;
         this.itemDAO = itemDAO;
         this.comboDAO = comboDAO;
+        this.buyItemDAO = buyItemDAO;
     }
 
     public Combo create(InComboDTO dto, HttpSession session) throws ExceptionController {
@@ -239,6 +242,18 @@ public class ComboService {
         var combo = comboDAO.getComboById(idCombo);
 
         if (!combo.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar combos que não sejam seus!");
+
+        for (var item : combo.getItems()){
+            item.setItem(null);
+            item.setCombo(null);
+            itemDAO.save(item);
+            itemDAO.delete(item);
+        }
+
+        for (var item : buyItemDAO.getAllByPackageItem(idCombo)) {
+            item.setItem(null);
+            buyItemDAO.save(item);
+        }
 
         itemDAO.deleteAll(combo.getItems());
         comboDAO.delete(combo);

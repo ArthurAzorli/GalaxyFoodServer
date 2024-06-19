@@ -19,12 +19,12 @@ public class ComboItem implements Serializable {
     @Column(nullable = false)
     private int quantity;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "item_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     private Food item;
 
     @ManyToOne(cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "buy_id", nullable = false)
+    @JoinColumn(name = "combo_id")
     private Combo combo;
 
     public ComboItem(UUID id, int quantity, Food item, Combo combo) {

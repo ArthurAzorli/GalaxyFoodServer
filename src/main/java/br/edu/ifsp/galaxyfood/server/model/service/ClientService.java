@@ -244,6 +244,12 @@ public class ClientService {
 
         if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
 
+        for (var buy : buyDAO.getAllByClient(id)){
+            buy.setSentAddress(null);
+            buy.setClient(null);
+            buyDAO.save(buy);
+        }
+
         clientDAO.deleteById(id);
 
         if (clientDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Cliente!");

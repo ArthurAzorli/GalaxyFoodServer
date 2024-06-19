@@ -28,12 +28,15 @@ public class BuyService {
 
     private final AddressDAO addressDAO;
 
-    public BuyService(@NonNull BuyDAO buyDAO, @NonNull PackageItemDAO packageItemDAO, @NonNull ClientDAO clientDAO, @NonNull RestaurantDAO restaurantDAO, @NonNull AddressDAO addressDAO) {
+    private final BuyItemDAO itemDAO;
+
+    public BuyService(@NonNull BuyDAO buyDAO, @NonNull PackageItemDAO packageItemDAO, @NonNull ClientDAO clientDAO, @NonNull RestaurantDAO restaurantDAO, @NonNull AddressDAO addressDAO, @NonNull BuyItemDAO itemDAO) {
         this.buyDAO = buyDAO;
         this.packageItemDAO = packageItemDAO;
         this.clientDAO = clientDAO;
         this.restaurantDAO = restaurantDAO;
         this.addressDAO = addressDAO;
+        this.itemDAO = itemDAO;
     }
 
     public Buy create(InBuyDTO dto, HttpSession session) throws ExceptionController {
@@ -62,7 +65,7 @@ public class BuyService {
         var address = addressDAO.getAddressById(dto.sentAddress());
         var date = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
-        var buy = new Buy(dto.paymentForm(), date, address, client, restaurant);
+        var buy = buyDAO.save(new Buy(dto.paymentForm(), date, address, client, restaurant));
 
         List<BuyItem> buyItems = new ArrayList<>();
         for (var itemDTO : dto.items()){
@@ -74,7 +77,9 @@ public class BuyService {
 
             var item = packageItemDAO.getPackageItemById(itemDTO.idItem());
 
-            buyItems.add(new BuyItem(buy, item, itemDTO.quantity()));
+            var buyItem = itemDAO.save(new BuyItem(buy, item, itemDTO.quantity()));
+
+            buyItems.add(buyItem);
         }
 
         buy.setItems(buyItems);

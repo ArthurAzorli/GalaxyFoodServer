@@ -6,6 +6,7 @@ import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantOwnerDAO;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import jakarta.servlet.http.HttpSession;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,7 +18,7 @@ public class RestaurantOwnerService {
 
     private final RestaurantDAO restaurantDAO;
 
-    public RestaurantOwnerService(RestaurantOwnerDAO repository, RestaurantDAO restaurantDAO) {
+    public RestaurantOwnerService(@NonNull RestaurantOwnerDAO repository, @NonNull RestaurantDAO restaurantDAO) {
         this.repository = repository;
         this.restaurantDAO = restaurantDAO;
     }

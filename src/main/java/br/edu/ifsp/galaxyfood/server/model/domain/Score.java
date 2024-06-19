@@ -18,7 +18,7 @@ public class Score implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "DECIMAL")
+    @Column(nullable = false, columnDefinition = "DECIMAL(1,1)")
     private BigDecimal score;
 
     @ManyToOne(cascade = CascadeType.REMOVE)

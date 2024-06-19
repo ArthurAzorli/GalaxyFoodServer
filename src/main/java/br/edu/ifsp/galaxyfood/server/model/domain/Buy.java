@@ -32,10 +32,10 @@ public class Buy implements Serializable {
     private LocalDateTime date;
 
     @ManyToOne
-    @JoinColumn(name = "sent_address", nullable = true)
+    @JoinColumn(name = "sent_address")
     private Address sentAddress;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 

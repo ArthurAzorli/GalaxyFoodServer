@@ -29,13 +29,16 @@ public class RestaurantService {
 
     private final PhoneDAO phoneDAO;
 
-    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO, @NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO, @NonNull PhoneDAO phoneDAO) {
+    private final BuyDAO buyDAO;
+
+    public RestaurantService(@NonNull RestaurantDAO restaurantDAO, RestaurantOwnerDAO ownerDAO, @NonNull AddressDAO addressDAO, @NonNull ClientDAO clientDAO, @NonNull ScoreDAO scoreDAO, @NonNull PhoneDAO phoneDAO, BuyDAO buyDAO) {
         this.restaurantDAO = restaurantDAO;
         this.ownerDAO = ownerDAO;
         this.addressDAO = addressDAO;
         this.clientDAO = clientDAO;
         this.scoreDAO = scoreDAO;
         this.phoneDAO = phoneDAO;
+        this.buyDAO = buyDAO;
     }
 
     public Restaurant login(String login, String password) throws ExceptionController {
@@ -303,7 +306,12 @@ public class RestaurantService {
             throw new ExceptionController(412, "Restaurante não cadastrado!");
         }
 
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        for (var buy : buyDAO.getAllByRestaurant(id)){
+            buy.setClient(null);
+            buy.setSentAddress(null);
+            buyDAO.save(buy);
+            buyDAO.delete(buy);
+        }
 
         restaurantDAO.deleteById(id);
 

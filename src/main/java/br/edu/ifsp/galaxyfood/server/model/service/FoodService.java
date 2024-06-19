@@ -2,6 +2,7 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Food;
 import br.edu.ifsp.galaxyfood.server.model.dto.InFoodDTO;
+import br.edu.ifsp.galaxyfood.server.model.repository.BuyItemDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.FoodDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.PackageDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
@@ -20,11 +21,14 @@ public class FoodService {
 
     private final PackageDAO packageDAO;
 
+    private final BuyItemDAO itemDAO;
+
     private final FoodDAO foodDAO;
 
-    public FoodService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO) {
+    public FoodService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull BuyItemDAO itemDAO, @NonNull FoodDAO foodDAO) {
         this.restaurantDAO = restaurantDAO;
         this.packageDAO = packageDAO;
+        this.itemDAO = itemDAO;
         this.foodDAO = foodDAO;
     }
 
@@ -167,6 +171,11 @@ public class FoodService {
         var food = foodDAO.getFoodById(idFood);
 
         if (!food.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar alimentos que não sejam seus!");
+
+        for (var item : itemDAO.getAllByPackageItem(idFood)) {
+            item.setItem(null);
+            itemDAO.save(item);
+        }
 
         foodDAO.delete(food);
 

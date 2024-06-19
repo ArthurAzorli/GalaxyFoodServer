@@ -184,7 +184,7 @@ public class PackageService {
         if (packageDAO.existsById(selectedPackage.getId())) throw new ExceptionController(500, "Erro ao deletar Pasta!");
     }
 
-    private List<Package> recursiveSeek(Package parent){
+    private List<Package> recursiveSeek(Package parent) throws ExceptionController{
         List<Package> list = new ArrayList<>();
 
         if (!parent.getItems().isEmpty()) throw new ExceptionController(401, "Você não pode deletar uma pasta com produtos dentro!");
