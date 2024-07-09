@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +28,19 @@ public class Buy implements Serializable {
     @Enumerated(EnumType.STRING)
     private PaymentForm paymentForm;
 
+    @Column(name = "order_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
     @Column(nullable = false, columnDefinition = "DATETIME")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime date;
+
+    @Column(nullable = false, columnDefinition = "DECIMAL(7,2)")
+    private BigDecimal deliveryFee = BigDecimal.ZERO;
+
+    @Column(nullable = false, columnDefinition = "DECIMAL(7,2)")
+    private BigDecimal discount = BigDecimal.ZERO;
 
     @ManyToOne
     @JoinColumn(name = "sent_address")
@@ -47,31 +58,38 @@ public class Buy implements Serializable {
 
     private List<BuyItem> items = new ArrayList<>();
 
-    public Buy(UUID id, PaymentForm paymentForm, LocalDateTime date, Address sentAddress, Client client, Restaurant restaurant, List<BuyItem> items) {
+    public Buy(UUID id, PaymentForm paymentForm, OrderStatus orderStatus, LocalDateTime date, BigDecimal deliveryFee, BigDecimal discount, Address sentAddress, Client client, Restaurant restaurant, List<BuyItem> items) {
         this.id = id;
         this.paymentForm = paymentForm;
+        this.orderStatus = orderStatus;
         this.date = date;
         this.sentAddress = sentAddress;
+        this.deliveryFee = deliveryFee;
+        this.discount = discount;
         this.client = client;
         this.restaurant = restaurant;
         this.items = items;
     }
 
-    public Buy(PaymentForm paymentForm, LocalDateTime date, Address sentAddress,Client client, Restaurant restaurant, List<BuyItem> items) {
-        this.id = UUID.randomUUID();
+    public Buy(PaymentForm paymentForm, OrderStatus orderStatus, LocalDateTime date, BigDecimal deliveryFee, BigDecimal discount, Address sentAddress,Client client, Restaurant restaurant, List<BuyItem> items) {
         this.paymentForm = paymentForm;
+        this.orderStatus = orderStatus;
         this.date = date;
         this.sentAddress = sentAddress;
+        this.deliveryFee = deliveryFee;
+        this.discount = discount;
         this.client = client;
         this.restaurant = restaurant;
         this.items = items;
     }
 
-    public Buy(PaymentForm paymentForm, LocalDateTime date, Address sentAddress, Client client, Restaurant restaurant) {
-        this.id = UUID.randomUUID();
+    public Buy(PaymentForm paymentForm, OrderStatus orderStatus, LocalDateTime date, BigDecimal deliveryFee, BigDecimal discount, Address sentAddress, Client client, Restaurant restaurant) {
         this.paymentForm = paymentForm;
+        this.orderStatus = orderStatus;
         this.date = date;
         this.sentAddress = sentAddress;
+        this.deliveryFee = deliveryFee;
+        this.discount = discount;
         this.client = client;
         this.restaurant = restaurant;
     }
@@ -86,7 +104,7 @@ public class Buy implements Serializable {
     public OutBuyDTO toDTO(){
         List<OutBuyItemDTO> list = new ArrayList<>();
         for (var item : items) list.add(item.toDTO());
-        return new OutBuyDTO(id, paymentForm.getCode(), date, sentAddress, client.toDTO(), restaurant.toDTO(), list);
+        return new OutBuyDTO(id, paymentForm.getCode(), orderStatus.getCode(), date, deliveryFee, discount, sentAddress, client.toDTO(), restaurant.toDTO(), list);
     }
 
 }

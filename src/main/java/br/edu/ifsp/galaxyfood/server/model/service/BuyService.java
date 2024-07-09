@@ -2,6 +2,7 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.Buy;
 import br.edu.ifsp.galaxyfood.server.model.domain.BuyItem;
+import br.edu.ifsp.galaxyfood.server.model.domain.OrderStatus;
 import br.edu.ifsp.galaxyfood.server.model.dto.InBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -46,6 +48,14 @@ public class BuyService {
         if (dto.restaurant() == null) throw new ExceptionController(400, "Restaurant id not sent!");
         if (dto.items() == null|| dto.items().isEmpty()) throw new ExceptionController(400, "Bought Items not sent!");
 
+        BigDecimal deliveryFee;
+        if (dto.deliveryFee() == null) deliveryFee = BigDecimal.ZERO;
+        else deliveryFee = dto.deliveryFee();
+
+        BigDecimal discount;
+        if (dto.discount() == null) discount = BigDecimal.ZERO;
+        else discount = dto.discount();
+
         if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
         if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
 
@@ -65,7 +75,7 @@ public class BuyService {
         var address = addressDAO.getAddressById(dto.sentAddress());
         var date = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
-        var buy = buyDAO.save(new Buy(dto.paymentForm(), date, address, client, restaurant));
+        var buy = buyDAO.save(new Buy(dto.paymentForm(), OrderStatus.WAITING, date, deliveryFee, discount, address, client, restaurant));
 
         List<BuyItem> buyItems = new ArrayList<>();
         for (var itemDTO : dto.items()){
@@ -156,5 +166,27 @@ public class BuyService {
         }
 
         return buys;
+    }
+
+    public Buy updateOrderStatus(UUID idBuy, OrderStatus status, HttpSession session){
+        if (idBuy == null) throw new ExceptionController(400, "Buy id not sent!");
+        if (status == null) throw new ExceptionController(400, "Order Status not sent!");
+
+        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
+        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+
+        var id = (UUID) session.getAttribute("user");
+
+        if (!restaurantDAO.existsById(id)) {
+            session.removeAttribute("user");
+            throw new ExceptionController(412, "Restaurante não cadastrado!");
+        }
+
+        if (!buyDAO.existsById(idBuy)) throw new ExceptionController(404, "Compra não econtrada!");
+
+        var buy = buyDAO.getBuyById(idBuy);
+
+        buy.setOrderStatus(status);
+        return buyDAO.save(buy);
     }
 }

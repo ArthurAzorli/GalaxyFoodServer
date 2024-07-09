@@ -1,5 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.controller;
 
+import br.edu.ifsp.galaxyfood.server.model.domain.OrderStatus;
 import br.edu.ifsp.galaxyfood.server.model.dto.InBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.BuyService;
@@ -51,6 +52,18 @@ public class BuyController {
 
             return ResponseEntity.status(302).body(list);
         } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
+    @PutMapping("/updatestatus/{id}")
+    public ResponseEntity<Object> updateStatus(@PathVariable("id") UUID buyId, @RequestParam int orderStatus , HttpSession session){
+        try {
+            var status = OrderStatus.getOrderStatus(orderStatus);
+            var buy = service.updateOrderStatus(buyId, status, session);
+
+            return ResponseEntity.status(202).body(buy);
+        }catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
