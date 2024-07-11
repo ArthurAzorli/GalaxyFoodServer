@@ -14,7 +14,7 @@ public enum PaymentForm {
         this.code = code;
     }
 
-    public static PaymentForm getPaymentForm(int code) {
+    public static PaymentForm getFromCode(int code) {
         for (PaymentForm paymentForm : PaymentForm.values()) {
             if (paymentForm.code == code) return paymentForm;
         }
