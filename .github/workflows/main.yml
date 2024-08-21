@@ -46,4 +46,4 @@ jobs:
           context: .
           dockerfile: Dockerfile
           push: true
-          image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
+          tag: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
