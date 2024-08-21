@@ -34,25 +34,16 @@ jobs:
           image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server:latest
 
 
-#      - name: login to docker hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#
-#      - name: push the docker image to docker hub
-#        uses: docker/build-push-action@v5
-#        with:
-#          context: .
-#          dockerfile: Dockerfile
-#          push: true
-#          image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server:latest
-      - name: Build & push Docker image
-        uses: mr-smithers-execellent/docker-build-push@v5
+      - name: login to docker hub
+        uses: docker/login-action@v1
         with:
-          image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
-          tags: latest
-          registry: docker.io
-          dockerfile: Dockerfile.ci
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: push the docker image to docker hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          dockerfile: Dockerfile
+          push: true
+          image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
