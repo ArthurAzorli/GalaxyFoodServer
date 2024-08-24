@@ -63,7 +63,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>springboot-images-new</finalName>
+        <finalName>galaxy-food-server</finalName>
     </build>
 
 </project>
