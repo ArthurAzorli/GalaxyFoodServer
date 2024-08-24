@@ -73,7 +73,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: Dockerfile-app
           push: true
           tags: azorli/galaxy-food-server:latest
   deploy:
