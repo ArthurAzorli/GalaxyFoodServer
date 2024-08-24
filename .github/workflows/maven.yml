@@ -21,10 +21,11 @@ jobs:
       run: mvn clean install
 
     - name: Build & Push Docker image
-      uses: mr-smithers-excellent/docker-build-push@v5
+      uses: mr-smithers-excellent/docker-build-push@v6
       with:
         image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
         tags: latest
+        registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
