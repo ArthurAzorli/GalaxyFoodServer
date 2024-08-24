@@ -25,7 +25,6 @@ jobs:
       with:
         image: ${{ secrets.DOCKER_HUB_USERNAME }}/galaxy-food-server
         tags: latest
-        registry: docker.io
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
