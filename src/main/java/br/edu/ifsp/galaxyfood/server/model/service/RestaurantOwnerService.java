@@ -46,44 +46,22 @@ public class RestaurantOwnerService {
         return repository.getOwnerById(id);
     }
 
-    public RestaurantOwner update(InRestaurantOwnerDTO dto, HttpSession session) throws ExceptionController{
-
+    public RestaurantOwner update(InRestaurantOwnerDTO dto, UUID idRestaurant) throws ExceptionController {
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
-
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var idRestaurant = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(idRestaurant)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
-
+        if (idRestaurant == null) throw new ExceptionController(401, "Restaurante não especificado!");
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
-
         var owner = restaurant.getOwner();
-
         owner.setName(dto.name());
 
         return repository.save(owner);
     }
 
-    public void delete(HttpSession session) throws ExceptionController{
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurant!");
-
-        var idRestaurant = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(idRestaurant)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
-
+    public void delete(UUID idRestaurant) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(401, "Restaurante não especificado!");
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
-
-        if (restaurantDAO.countByOwner(restaurant.getOwner())>1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
-
+        if (restaurantDAO.countByOwner(restaurant.getOwner()) > 1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
         restaurantDAO.delete(restaurant);
         repository.delete(restaurant.getOwner());
 

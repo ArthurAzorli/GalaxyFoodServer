@@ -41,9 +41,9 @@ public class RestaurantOwnerController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody InRestaurantOwnerDTO dto, HttpSession session){
+    public ResponseEntity<Object> update(@PathVariable("restaurantId") UUID restaurantId, @RequestBody InRestaurantOwnerDTO dto) {
         try {
-            var owner = service.update(dto, session);
+            var owner = service.update(dto, restaurantId);
             return ResponseEntity.status(202).body(owner.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -51,17 +51,12 @@ public class RestaurantOwnerController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> delete(HttpSession session){
+    public ResponseEntity<Object> delete(@PathVariable("restaurantId") UUID restaurantId) {
         try {
-            service.delete(session);
-
-            session.removeAttribute("user");
-            session.removeAttribute("type");
-
+            service.delete(restaurantId);
             var data = new HashMap<String, Object>();
             data.put("message", "Dono deletado com Sucesso!");
             data.put("result", true);
-
             return ResponseEntity.ok(data);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));

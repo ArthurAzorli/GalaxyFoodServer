@@ -27,7 +27,7 @@ public class ComboController {
     @PostMapping("/create")
     public ResponseEntity<Object> create(@RequestBody InComboDTO dto, HttpSession session){
         try {
-            var combo = service.create(dto, session);
+            var combo = service.create(dto);
             return ResponseEntity.status(201).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -45,9 +45,9 @@ public class ComboController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
+    public ResponseEntity<Object> getAll(@PathVariable("id") UUID id){
         try {
-            var combos = service.getAll(session);
+            var combos = service.getAll(id);
 
             List<OutComboDTO> list = new ArrayList<>();
             for (var combo : combos) list.add(combo.comboToDTO());
@@ -61,7 +61,7 @@ public class ComboController {
     @GetMapping("/get/restaurant/{id}")
     public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant, HttpSession session){
         try {
-            var combos = service.getAll(idRestaurant, session);
+            var combos = service.getAll(idRestaurant);
 
             List<OutComboDTO> list = new ArrayList<>();
             for (var combo : combos) list.add(combo.comboToDTO());
@@ -73,9 +73,9 @@ public class ComboController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idCombo, @RequestBody InComboDTO dto, HttpSession session){
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InComboDTO dto, @RequestParam("restaurantId") UUID restaurantId) {
         try {
-            var combo = service.update(idCombo, dto, session);
+            var combo = service.update(id, dto, restaurantId);
             return ResponseEntity.status(202).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -83,20 +83,19 @@ public class ComboController {
     }
 
     @PutMapping("/move/{idCombo}/{idPackage}")
-    public ResponseEntity<Object> move(@PathVariable("idCombo") UUID idCombo, @PathVariable("idPackage") UUID idParent, HttpSession session){
+    public ResponseEntity<Object> move(@PathVariable("idCombo") UUID idCombo, @PathVariable("idPackage") UUID idParent, @RequestParam("restaurantId") UUID restaurantId) {
         try {
-            var combo = service.move(idCombo, idParent, session);
+            var combo = service.move(idCombo, idParent, restaurantId);
             return ResponseEntity.status(202).body(combo.comboToDTO());
-
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @PutMapping("/addfood")
-    public ResponseEntity<Object> addFood(@RequestBody InComboItemDTO dto, HttpSession session){
+    public ResponseEntity<Object> addFood(@RequestBody InComboItemDTO dto, @RequestParam("restaurantId") UUID restaurantId) {
         try {
-            var combo = service.addFood(dto, session);
+            var combo = service.addFood(dto, restaurantId);
             return ResponseEntity.status(201).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -104,25 +103,22 @@ public class ComboController {
     }
 
     @DeleteMapping("/remfood/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+    public ResponseEntity<Object> remFood(@PathVariable("id") UUID idItem, @RequestParam("restaurantId") UUID restaurantId) {
         try {
-            var combo = service.remFood(id, session);
+            var combo = service.remFood(idItem, restaurantId);
             return ResponseEntity.ok(combo.comboToDTO());
-
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idCombo, HttpSession session){
+    public ResponseEntity<Object> delete(@PathVariable("id") UUID idCombo, @RequestParam("restaurantId") UUID restaurantId) {
         try {
-            service.delete(idCombo, session);
-
+            service.delete(idCombo, restaurantId);
             var data = new HashMap<String, Object>();
             data.put("message", "Combo deletado com Sucesso!");
             data.put("result", true);
-
             return ResponseEntity.ok(data);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));

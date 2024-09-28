@@ -65,11 +65,11 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody InClientDTO dto, HttpSession session){
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id,@RequestBody InClientDTO dto, HttpSession session){
         try {
 
-            var client = service.update(dto, session);
+            var client = service.update(dto,id);
             return ResponseEntity.status(202).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -77,10 +77,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/changepassword")
-    public ResponseEntity<Object> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
+    @PutMapping("/changepassword/{id}")
+    public ResponseEntity<Object> changePassword(@PathVariable("id") UUID id,@RequestBody PasswordDTO dto, HttpSession session) {
         try {
-            service.changePassword(dto.oldPassword(), dto.newPassword(), session);
+            service.changePassword(dto.oldPassword(), dto.newPassword(), id);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Senha atualizada com sucesso!");
@@ -93,10 +93,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/addphone")
-    public ResponseEntity<Object> addPhone(@RequestBody InPhoneDTO dto, HttpSession session){
+    @PutMapping("/addphone/{id}")
+    public ResponseEntity<Object> addPhone(@PathVariable("id") UUID id,@RequestBody InPhoneDTO dto, HttpSession session){
         try {
-            var client = service.addPhone(dto.phone(), session);
+            var client = service.addPhone(dto.phone(), id);
             return ResponseEntity.status(201).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -105,9 +105,9 @@ public class ClientController {
     }
 
     @PutMapping("/addaddress")
-    public ResponseEntity<Object> addAddress(@RequestBody InAddressDTO dto, HttpSession session){
+    public ResponseEntity<Object> addAddress(@PathVariable("id") UUID id,@RequestBody InAddressDTO dto, HttpSession session){
         try {
-            var client = service.addAddress(dto, session);
+            var client = service.addAddress(dto, id);
             return ResponseEntity.status(201).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -115,38 +115,33 @@ public class ClientController {
         }
     }
 
-    @DeleteMapping("/remphone/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remphone/{clientId}/{id}")
+    public ResponseEntity<Object> remPhone( @PathVariable("clientId") UUID clientId, @PathVariable("id") UUID id) {
         try {
-            var client = service.remPhone(id, session);
+            var client = service.remPhone(clientId, id);
             return ResponseEntity.ok(client.toDTO());
-
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @DeleteMapping("/remaddress/{id}")
-    public ResponseEntity<Object> remAddress(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remaddress/{id}/{clientId}")
+    public ResponseEntity<Object> remAddress( @PathVariable("clientId") UUID clientId, @PathVariable("id") UUID id) {
         try {
-            var client = service.remAddress(id, session);
+            var client = service.remAddress(id, clientId);
             return ResponseEntity.ok(client.toDTO());
-
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> delete(HttpSession session){
+    public ResponseEntity<Object> delete(@PathVariable("clientId") UUID clientId) {
         try {
-            service.delete(session);
-
-            session.removeAttribute("user");
-            session.removeAttribute("type");
+            service.delete(clientId);
 
             var data = new HashMap<String, Object>();
-            data.put("message", "Cliente deletado com Sucesso!");
+            data.put("message", "Cliente deletado com sucesso!");
             data.put("result", true);
 
             return ResponseEntity.ok(data);

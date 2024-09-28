@@ -24,69 +24,40 @@ public class FoodController {
     private FoodService service;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InFoodDTO dto, HttpSession session){
+    public ResponseEntity<Object> create(@RequestBody InFoodDTO dto, HttpSession session) {
+        UUID restaurantId = (UUID) session.getAttribute("restaurantId"); // Exemplo de como obter o restaurantId da sessão
         try {
-            var food = service.create(dto, session);
-            return ResponseEntity.status(201).body(food.foodToDTO());
+            var food = service.create(dto, restaurantId);
+
+            var data = new HashMap<String, Object>();
+            data.put("message", "Food item created successfully!");
+            data.put("result", true);
+            data.put("food", food.toDTO()); // Converta para DTO se necessário
+
+            return ResponseEntity.status(201).body(data);
+
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id){
+    public ResponseEntity<Object> get(@PathVariable("id") UUID id) {
         try {
             var food = service.get(id);
-            return ResponseEntity.status(302).body(food.foodToDTO());
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
+            return ResponseEntity.ok(food.toDTO()); // Converta para DTO se necessário
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
-        try {
-            var foods = service.getAll(session);
-
-            List<OutFoodDTO> list = new ArrayList<>();
-            for (var food : foods) list.add(food.foodToDTO());
-
-            return ResponseEntity.status(302).body(list);
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant, HttpSession session){
-        try {
-            var foods = service.getAll(idRestaurant, session);
-
-            List<OutFoodDTO> list = new ArrayList<>();
-            for (var food : foods) list.add(food.foodToDTO());
-
-            return ResponseEntity.status(302).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idFood, @RequestBody InFoodDTO dto, HttpSession session){
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InFoodDTO dto, HttpSession session) {
+        UUID restaurantId = (UUID) session.getAttribute("restaurantId"); // Exemplo de como obter o restaurantId da sessão
         try {
-            var food = service.update(idFood, dto, session);
-            return ResponseEntity.status(202).body(food.foodToDTO());
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @PutMapping("/move/{idFood}/{idPackage}")
-    public ResponseEntity<Object> move(@PathVariable("idFood") UUID idFood, @PathVariable("idPackage") UUID idParent, HttpSession session){
-        try {
-
-            var food = service.move(idFood, idParent, session);
-            return ResponseEntity.status(202).body(food.foodToDTO());
+            var food = service.update(id, dto, restaurantId);
+            return ResponseEntity.status(202).body(food.toDTO()); // Converta para DTO se necessário
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -94,12 +65,13 @@ public class FoodController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idFood, HttpSession session){
+    public ResponseEntity<Object> delete(@PathVariable("id") UUID id, HttpSession session) {
+        UUID restaurantId = (UUID) session.getAttribute("restaurantId"); // Exemplo de como obter o restaurantId da sessão
         try {
-            service.delete(idFood, session);
+            service.delete(id, restaurantId);
 
             var data = new HashMap<String, Object>();
-            data.put("message", "Alimento deletado com Sucesso!");
+            data.put("message", "Food item deleted successfully!");
             data.put("result", true);
 
             return ResponseEntity.ok(data);
