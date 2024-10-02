@@ -54,6 +54,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>ServerApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -63,6 +64,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>galaxy-food-server</finalName>
     </build>
 
 </project>

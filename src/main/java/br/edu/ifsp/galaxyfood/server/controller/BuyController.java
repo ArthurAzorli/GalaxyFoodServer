@@ -20,8 +20,6 @@ import java.util.UUID;
 @RequestMapping("/buy")
 public class BuyController {
 
-    //comentario teste para mostrar esquemas git
-
     @Autowired
     private BuyService service;
 
