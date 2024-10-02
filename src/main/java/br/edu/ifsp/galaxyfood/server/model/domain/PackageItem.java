@@ -31,7 +31,7 @@ public abstract class PackageItem implements Serializable {
 
     @Lob
     @Column(columnDefinition = "LONGBLOB")
-    protected byte[] image;
+    protected byte[] image= new byte[0];
 
     public OutPackageItemDTO toDTO(){
         return new OutPackageItemDTO(id, name, price, image, parent.getId());

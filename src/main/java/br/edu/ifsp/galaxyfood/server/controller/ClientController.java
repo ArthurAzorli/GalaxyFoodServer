@@ -20,16 +20,13 @@ public class ClientController {
     private ClientService service;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginDTO dto, HttpSession session) {
+    public ResponseEntity<Object> login(@RequestBody LoginDTO dto) {
         try {
             var client = service.login(dto.login(), dto.password());
-
-            session.setAttribute("user", client.getId());
-            session.setAttribute("type", "client");
-
             var data = new HashMap<String, Object>();
             data.put("message", "Login realizado com sucesso!");
             data.put("result", true);
+            data.put("data",client.getId());
 
             return ResponseEntity.ok(data);
 
