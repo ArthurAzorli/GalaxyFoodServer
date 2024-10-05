@@ -5,23 +5,18 @@ import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantOwnerDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantOwnerDAO;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class RestaurantOwnerService {
 
     private final RestaurantOwnerDAO repository;
 
     private final RestaurantDAO restaurantDAO;
-
-    public RestaurantOwnerService(@NonNull RestaurantOwnerDAO repository, @NonNull RestaurantDAO restaurantDAO) {
-        this.repository = repository;
-        this.restaurantDAO = restaurantDAO;
-    }
 
     public RestaurantOwner create(InRestaurantOwnerDTO dto) throws ExceptionController {
 
@@ -46,19 +41,11 @@ public class RestaurantOwnerService {
         return repository.getOwnerById(id);
     }
 
-    public RestaurantOwner update(InRestaurantOwnerDTO dto, HttpSession session) throws ExceptionController{
-
+    public RestaurantOwner update(UUID idRestaurant, InRestaurantOwnerDTO dto) throws ExceptionController{
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var idRestaurant = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(idRestaurant)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 
@@ -69,16 +56,10 @@ public class RestaurantOwnerService {
         return repository.save(owner);
     }
 
-    public void delete(HttpSession session) throws ExceptionController{
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurant!");
+    public void delete(UUID idRestaurant) throws ExceptionController{
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
 
-        var idRestaurant = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(idRestaurant)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 

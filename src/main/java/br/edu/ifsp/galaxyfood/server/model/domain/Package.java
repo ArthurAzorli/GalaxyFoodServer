@@ -81,9 +81,12 @@ public class Package implements Serializable {
 
     public OutPackageDTO toDTO(){
         List<OutPackageDTO> listPackages = new ArrayList<>();
-        List<OutPackageItemDTO> listItems = new ArrayList<>();
+        List<Object> listItems = new ArrayList<>();
         for (var pack : children) listPackages.add(pack.toDTO());
-        for (var item : items) listItems.add(item.toDTO());
+        for (var item : items) listItems.add(
+                item instanceof Food? ((Food) item).foodToDTO() :
+                item instanceof Combo? ((Combo) item).comboToDTO() :
+                item.toDTO());
 
         UUID parent;
         if (this.parent == null) parent = null;

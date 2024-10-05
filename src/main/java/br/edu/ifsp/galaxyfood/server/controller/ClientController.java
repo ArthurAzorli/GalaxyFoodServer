@@ -4,7 +4,6 @@ import br.edu.ifsp.galaxyfood.server.model.dto.*;
 import br.edu.ifsp.galaxyfood.server.model.service.ClientService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,16 +19,14 @@ public class ClientController {
     private ClientService service;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginDTO dto, HttpSession session) {
+    public ResponseEntity<Object> login(@RequestBody LoginDTO dto) {
         try {
             var client = service.login(dto.login(), dto.password());
-
-            session.setAttribute("user", client.getId());
-            session.setAttribute("type", "client");
 
             var data = new HashMap<String, Object>();
             data.put("message", "Login realizado com sucesso!");
             data.put("result", true);
+            data.put("data", client.getId());
 
             return ResponseEntity.ok(data);
 
@@ -39,14 +36,10 @@ public class ClientController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InClientDTO dto, HttpSession session) {
+    public ResponseEntity<Object> create(@RequestBody InClientDTO dto) {
        try {
 
            var client = service.create(dto);
-
-           session.setAttribute("user", client.getId());
-           session.setAttribute("type", "client");
-
            return ResponseEntity.status(201).body(client.toDTO());
 
        } catch (ExceptionController e) {
@@ -65,11 +58,11 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody InClientDTO dto, HttpSession session){
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InClientDTO dto){
         try {
 
-            var client = service.update(dto, session);
+            var client = service.update(id, dto);
             return ResponseEntity.status(202).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -77,10 +70,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/changepassword")
-    public ResponseEntity<Object> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
+    @PutMapping("/changepassword/{id}")
+    public ResponseEntity<Object> changePassword(@PathVariable("id") UUID id, @RequestBody PasswordDTO dto) {
         try {
-            service.changePassword(dto.oldPassword(), dto.newPassword(), session);
+            service.changePassword(id, dto.oldPassword(), dto.newPassword());
 
             var data = new HashMap<String, Object>();
             data.put("message", "Senha atualizada com sucesso!");
@@ -93,10 +86,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/addphone")
-    public ResponseEntity<Object> addPhone(@RequestBody InPhoneDTO dto, HttpSession session){
+    @PutMapping("/addphone/{id}")
+    public ResponseEntity<Object> addPhone(@PathVariable("id") UUID id, @RequestBody InPhoneDTO dto){
         try {
-            var client = service.addPhone(dto.phone(), session);
+            var client = service.addPhone(id, dto.phone());
             return ResponseEntity.status(201).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -104,10 +97,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/addaddress")
-    public ResponseEntity<Object> addAddress(@RequestBody InAddressDTO dto, HttpSession session){
+    @PutMapping("/addaddress/{id}")
+    public ResponseEntity<Object> addAddress(@PathVariable("id") UUID id, @RequestBody InAddressDTO dto){
         try {
-            var client = service.addAddress(dto, session);
+            var client = service.addAddress(id, dto);
             return ResponseEntity.status(201).body(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -115,10 +108,10 @@ public class ClientController {
         }
     }
 
-    @DeleteMapping("/remphone/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remphone/{id}/{idPhone}")
+    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, @PathVariable("idPhone") UUID idPhone){
         try {
-            var client = service.remPhone(id, session);
+            var client = service.remPhone(id, idPhone);
             return ResponseEntity.ok(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -126,10 +119,10 @@ public class ClientController {
         }
     }
 
-    @DeleteMapping("/remaddress/{id}")
-    public ResponseEntity<Object> remAddress(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remaddress/{id}/{idAddress}")
+    public ResponseEntity<Object> remAddress(@PathVariable("id") UUID id, @PathVariable("idAddress") UUID idAddress){
         try {
-            var client = service.remAddress(id, session);
+            var client = service.remAddress(id, idAddress);
             return ResponseEntity.ok(client.toDTO());
 
         } catch (ExceptionController e) {
@@ -138,12 +131,10 @@ public class ClientController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> delete(HttpSession session){
+    public ResponseEntity<Object> delete(
+            @RequestBody LoginDTO dto){
         try {
-            service.delete(session);
-
-            session.removeAttribute("user");
-            session.removeAttribute("type");
+            service.delete(dto);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Cliente deletado com Sucesso!");

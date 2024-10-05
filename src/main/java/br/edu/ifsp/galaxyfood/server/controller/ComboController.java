@@ -6,7 +6,6 @@ import br.edu.ifsp.galaxyfood.server.model.dto.OutComboDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.ComboService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +23,10 @@ public class ComboController {
     @Autowired
     private ComboService service;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InComboDTO dto, HttpSession session){
+    @PostMapping("/create/{idRestaurant}")
+    public ResponseEntity<Object> create(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InComboDTO dto){
         try {
-            var combo = service.create(dto, session);
+            var combo = service.create(idRestaurant, dto);
             return ResponseEntity.status(201).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -45,9 +44,9 @@ public class ComboController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
+    public ResponseEntity<Object> getAll(){
         try {
-            var combos = service.getAll(session);
+            var combos = service.getAll();
 
             List<OutComboDTO> list = new ArrayList<>();
             for (var combo : combos) list.add(combo.comboToDTO());
@@ -59,9 +58,9 @@ public class ComboController {
     }
 
     @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant, HttpSession session){
+    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
         try {
-            var combos = service.getAll(idRestaurant, session);
+            var combos = service.getAllByRestaurant(idRestaurant);
 
             List<OutComboDTO> list = new ArrayList<>();
             for (var combo : combos) list.add(combo.comboToDTO());
@@ -72,20 +71,20 @@ public class ComboController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idCombo, @RequestBody InComboDTO dto, HttpSession session){
+    @PutMapping("/update/{idRestaurant}/{id}")
+    public ResponseEntity<Object> update(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idCombo, @RequestBody InComboDTO dto){
         try {
-            var combo = service.update(idCombo, dto, session);
+            var combo = service.update(idRestaurant,idCombo, dto);
             return ResponseEntity.status(202).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @PutMapping("/move/{idCombo}/{idPackage}")
-    public ResponseEntity<Object> move(@PathVariable("idCombo") UUID idCombo, @PathVariable("idPackage") UUID idParent, HttpSession session){
+    @PutMapping("/move/{idRestaurant}/{idCombo}/{idPackage}")
+    public ResponseEntity<Object> move(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idCombo") UUID idCombo, @PathVariable("idPackage") UUID idParent){
         try {
-            var combo = service.move(idCombo, idParent, session);
+            var combo = service.move(idRestaurant,idCombo, idParent);
             return ResponseEntity.status(202).body(combo.comboToDTO());
 
         } catch (ExceptionController e) {
@@ -93,20 +92,20 @@ public class ComboController {
         }
     }
 
-    @PutMapping("/addfood")
-    public ResponseEntity<Object> addFood(@RequestBody InComboItemDTO dto, HttpSession session){
-        try {
-            var combo = service.addFood(dto, session);
+    @PutMapping("/addfood/{idRestaurant}")
+    public ResponseEntity<Object> addFood(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InComboItemDTO dto){
+         try {
+            var combo = service.addFood(idRestaurant, dto);
             return ResponseEntity.status(201).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @DeleteMapping("/remfood/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remfood/{idRestaurant}/{id}")
+    public ResponseEntity<Object> remPhone(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
-            var combo = service.remFood(id, session);
+            var combo = service.remFood(idRestaurant, id);
             return ResponseEntity.ok(combo.comboToDTO());
 
         } catch (ExceptionController e) {
@@ -114,10 +113,10 @@ public class ComboController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idCombo, HttpSession session){
+    @DeleteMapping("/delete/{idRestaurant}/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idCombo){
         try {
-            service.delete(idCombo, session);
+            service.delete(idRestaurant, idCombo);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Combo deletado com Sucesso!");

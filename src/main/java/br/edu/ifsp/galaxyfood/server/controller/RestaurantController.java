@@ -22,16 +22,14 @@ public class RestaurantController {
     private RestaurantService service;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginDTO dto, HttpSession session) {
+    public ResponseEntity<Object> login(@RequestBody LoginDTO dto) {
         try {
             var restaurant = service.login(dto.login(), dto.password());
-
-            session.setAttribute("user", restaurant.getId());
-            session.setAttribute("type", "restaurant");
 
             var data = new HashMap<String, Object>();
             data.put("message", "Login realizado com sucesso!");
             data.put("result", true);
+            data.put("data", restaurant.getId());
 
             return ResponseEntity.ok(data);
 
@@ -41,12 +39,9 @@ public class RestaurantController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InRestaurantDTO dto, HttpSession session) {
+    public ResponseEntity<Object> create(@RequestBody InRestaurantDTO dto) {
         try {
             var restaurant = service.create(dto);
-
-            session.setAttribute("user", restaurant.getId());
-            session.setAttribute("type", "restaurant");
 
             return ResponseEntity.status(201).body(restaurant.toDTO());
 
@@ -67,9 +62,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
+    public ResponseEntity<Object> getAll(){
         try {
-            var restaurants = service.getAll(session);
+            var restaurants = service.getAll();
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
             return ResponseEntity.status(302).body(list);
@@ -80,9 +75,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/getOfLocal")
-    public ResponseEntity<Object> getAll(@RequestParam(value = "address") UUID address, HttpSession session){
+    public ResponseEntity<Object> getAll(@RequestParam(value = "address") UUID address){
         try {
-            var restaurants = service.getAllOfLocal(address, session);
+            var restaurants = service.getAllOfLocal(address);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
             return ResponseEntity.status(302).body(list);
@@ -93,9 +88,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> search(@RequestParam(value = "text") String text, HttpSession session){
+    public ResponseEntity<Object> search(@RequestParam(value = "text") String text){
         try {
-            var restaurants = service.search(text, session);
+            var restaurants = service.search(text);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
             return ResponseEntity.status(302).body(list);
@@ -106,9 +101,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/searchOfLocal")
-    public ResponseEntity<Object> search(@RequestParam(value = "text") String text, @RequestParam(value = "address") UUID address, HttpSession session){
+    public ResponseEntity<Object> search(@RequestParam(value = "text") String text, @RequestParam(value = "address") UUID address){
         try {
-            var restaurants = service.searchOfLocal(text, address, session);
+            var restaurants = service.searchOfLocal(text, address);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
             return ResponseEntity.status(302).body(list);
@@ -118,11 +113,11 @@ public class RestaurantController {
         }
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Object> update(@RequestBody InRestaurantDTO dto, HttpSession session){
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InRestaurantDTO dto){
         try {
 
-            var restaurant = service.update(dto, session);
+            var restaurant = service.update(id, dto);
             return ResponseEntity.status(202).body(restaurant.toDTO());
 
         } catch (ExceptionController e) {
@@ -130,10 +125,10 @@ public class RestaurantController {
         }
     }
 
-    @PutMapping("/changepassword")
-    public ResponseEntity<Object> changePassword(@RequestBody PasswordDTO dto, HttpSession session) {
+    @PutMapping("/changepassword/{id}")
+    public ResponseEntity<Object> changePassword(@PathVariable("id") UUID id, @RequestBody PasswordDTO dto) {
         try {
-            service.changePassword(dto.oldPassword(), dto.newPassword(), session);
+            service.changePassword(id, dto.oldPassword(), dto.newPassword());
 
             var data = new HashMap<String, Object>();
             data.put("message", "Senha atualizada com sucesso!");
@@ -146,10 +141,10 @@ public class RestaurantController {
         }
     }
 
-    @PutMapping("/addphone")
-    public ResponseEntity<Object> addPhone(@RequestBody InPhoneDTO dto, HttpSession session){
+    @PutMapping("/addphone/{id}")
+    public ResponseEntity<Object> addPhone(@PathVariable("id") UUID id, @RequestBody InPhoneDTO dto){
         try {
-            var restaurant = service.addPhone(dto.phone(), session);
+            var restaurant = service.addPhone(id, dto.phone());
             return ResponseEntity.status(201).body(restaurant.toDTO());
 
         } catch (ExceptionController e) {
@@ -157,10 +152,10 @@ public class RestaurantController {
         }
     }
 
-    @PutMapping("/score/{id}")
-    public ResponseEntity<Object> score (@PathVariable("id") UUID idRestaurant,  @RequestBody InScoreDTO dto, HttpSession session){
+    @PutMapping("/score/{idRestaurant}/{idClient}")
+    public ResponseEntity<Object> score (@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idClient") UUID idClient,  @RequestBody InScoreDTO dto){
         try {
-            var restaurant = service.score(idRestaurant, dto, session);
+            var restaurant = service.score(idRestaurant, idClient, dto);
             return ResponseEntity.status(202).body(restaurant.toDTO());
 
         } catch (ExceptionController e) {
@@ -168,10 +163,10 @@ public class RestaurantController {
         }
     }
 
-    @DeleteMapping("/remphone/{id}")
-    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, HttpSession session){
+    @DeleteMapping("/remphone/{id}/{idPhone}")
+    public ResponseEntity<Object> remPhone(@PathVariable("id") UUID id, @PathVariable("idPhone") UUID idPhone){
         try {
-            var restaurant = service.remPhone(id, session);
+            var restaurant = service.remPhone(id, idPhone);
             return ResponseEntity.ok(restaurant.toDTO());
 
         } catch (ExceptionController e) {
@@ -179,13 +174,10 @@ public class RestaurantController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<Object> delete(HttpSession session){
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("id") UUID id){
         try {
-            service.delete(session);
-
-            session.removeAttribute("user");
-            session.removeAttribute("type");
+            service.delete(id);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Restaurante deletado com Sucesso!");

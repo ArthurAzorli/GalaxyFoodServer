@@ -5,20 +5,20 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Client;
 import br.edu.ifsp.galaxyfood.server.model.domain.Phone;
 import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.BuyDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.ClientDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.PhoneDAO;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class ClientService {
 
     private final ClientDAO clientDAO;
@@ -28,13 +28,6 @@ public class ClientService {
     private final PhoneDAO phoneDAO;
 
     private final BuyDAO buyDAO;
-
-    public ClientService(@NonNull ClientDAO clientDAO, @NonNull AddressDAO addressDAO, @NonNull PhoneDAO phoneDAO, @NonNull BuyDAO buyDAO) {
-        this.clientDAO = clientDAO;
-        this.addressDAO = addressDAO;
-        this.phoneDAO = phoneDAO;
-        this.buyDAO = buyDAO;
-    }
 
     public Client login(String login, String password) throws ExceptionController {
         if (login == null || login.isEmpty()) throw new ExceptionController(400, "Login not send!");
@@ -72,20 +65,13 @@ public class ClientService {
         return clientDAO.getClientById(id);
     }
 
-    public Client update(InClientDTO dto, HttpSession session) throws ExceptionController{
+    public Client update(UUID id, InClientDTO dto) throws ExceptionController{
 
+        if (id == null) throw new ExceptionController(400, "ID not send!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
         if (dto.email() == null) throw new ExceptionController(400, "Email not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         var client = clientDAO.getClientById(id);
         client.setName(dto.name());
@@ -95,19 +81,12 @@ public class ClientService {
         return clientDAO.save(client);
     }
 
-    public void changePassword(String oldPassword, String newPassword, HttpSession session){
+    public void changePassword(UUID id, String oldPassword, String newPassword){
+        if (id == null) throw new ExceptionController(400, "ID not send!");
         if (oldPassword == null || oldPassword.isEmpty()) throw new ExceptionController(400, "Old password not send!");
         if (newPassword == null || newPassword.isEmpty()) throw new ExceptionController(400, "New password not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         var client = clientDAO.getClientById(id);
 
@@ -119,18 +98,11 @@ public class ClientService {
         clientDAO.save(client);
     }
 
-    public Client addPhone(String phone, HttpSession session){
+    public Client addPhone(UUID id, String phone){
+        if (id == null) throw new ExceptionController(400, "ID not send!");
         if (phone == null) throw new ExceptionController(400, "Phone not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         var client = clientDAO.getClientById(id);
 
@@ -143,18 +115,11 @@ public class ClientService {
         return clientDAO.save(client);
     }
 
-    public Client remPhone(UUID idPhone, HttpSession session){
-        if (idPhone == null) throw new ExceptionController(400, "Phone not send!");
+    public Client remPhone(UUID id, UUID idPhone){
+        if (id == null) throw new ExceptionController(400, "ID not send!");
+        if (idPhone == null) throw new ExceptionController(400, "ID Phone not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         if (!phoneDAO.existsById(idPhone)) throw new ExceptionController(404, "Telefone não encontrado!");
 
@@ -170,7 +135,8 @@ public class ClientService {
         return client;
     }
 
-    public Client addAddress(InAddressDTO dto, HttpSession session){
+    public Client addAddress(UUID id, InAddressDTO dto){
+        if (id == null) throw new ExceptionController(400, "ID not send!");
         if (dto.street() == null) throw new ExceptionController(400, "Street not send!");
         if (dto.number() == null) throw new ExceptionController(400, "Number not send!");
         if (dto.neighborhood() == null) throw new ExceptionController(400, "Neighborhood not send!");
@@ -180,15 +146,7 @@ public class ClientService {
 
         var address = new Address(dto.street(), dto.number(), dto.neighborhood(), dto.city(), dto.state(), dto.cep());
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         var client = clientDAO.getClientById(id);
 
@@ -203,18 +161,11 @@ public class ClientService {
         return clientDAO.save(client);
     }
 
-    public Client remAddress(UUID idAddress, HttpSession session){
+    public Client remAddress(UUID id, UUID idAddress){
+        if (id == null) throw new ExceptionController(400, "ID not send!");
         if (idAddress == null) throw new ExceptionController(400, "Address id not send!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        if (!clientDAO.existsById(id)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
         if (!addressDAO.existsById(idAddress)) throw new ExceptionController(409, "Endereço não encontrado!");
 
@@ -231,27 +182,24 @@ public class ClientService {
         return client;
     }
 
-    public void delete(HttpSession session) throws ExceptionController{
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("client")) throw new ExceptionController(401, "Você não está Logado em uma conta de Cliente!");
+    public void delete(LoginDTO dto) throws ExceptionController{
+        if (dto.login() == null || dto.login().isEmpty()) throw new ExceptionController(400, "Login not send!");
+        if (dto.password() == null || dto.password().isEmpty()) throw new ExceptionController(400, "Password not send!");
 
-        var id = (UUID) session.getAttribute("user");
+        if (!clientDAO.existsClientByEmail(dto.login())) throw new ExceptionController(404, "Cliente não encontrado!");
 
-        if (!clientDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Cliente não cadastrado!");
-        }
+        var client = clientDAO.getByEmail(dto.login());
 
-        if (!clientDAO.existsById(id)) throw new ExceptionController(404, "Cliente não encontrado!");
+        if (!client.getPassword().equals(Cripto.md5(dto.login()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
 
-        for (var buy : buyDAO.getAllByClient(id)){
+        for (var buy : buyDAO.getAllByClient(client.getId())){
             buy.setSentAddress(null);
             buy.setClient(null);
             buyDAO.save(buy);
         }
 
-        clientDAO.deleteById(id);
+        clientDAO.deleteById(client.getId());
 
-        if (clientDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Cliente!");
+        if (clientDAO.existsById(client.getId())) throw new ExceptionController(500, "Erro ao deletar Cliente!");
     }
 }

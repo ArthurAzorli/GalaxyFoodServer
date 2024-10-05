@@ -23,10 +23,10 @@ public class FoodController {
     @Autowired
     private FoodService service;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InFoodDTO dto, HttpSession session){
+    @PostMapping("/create/{idRestaurant}")
+    public ResponseEntity<Object> create(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InFoodDTO dto){
         try {
-            var food = service.create(dto, session);
+            var food = service.create(idRestaurant, dto);
             return ResponseEntity.status(201).body(food.foodToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -44,9 +44,9 @@ public class FoodController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
+    public ResponseEntity<Object> getAll(){
         try {
-            var foods = service.getAll(session);
+            var foods = service.getAll();
 
             List<OutFoodDTO> list = new ArrayList<>();
             for (var food : foods) list.add(food.foodToDTO());
@@ -58,9 +58,9 @@ public class FoodController {
     }
 
     @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant, HttpSession session){
+    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
         try {
-            var foods = service.getAll(idRestaurant, session);
+            var foods = service.getAllByRestaurant(idRestaurant);
 
             List<OutFoodDTO> list = new ArrayList<>();
             for (var food : foods) list.add(food.foodToDTO());
@@ -71,21 +71,21 @@ public class FoodController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idFood, @RequestBody InFoodDTO dto, HttpSession session){
+    @PutMapping("/update/{idRestaurant}/{id}")
+    public ResponseEntity<Object> update(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idFood, @RequestBody InFoodDTO dto){
         try {
-            var food = service.update(idFood, dto, session);
+            var food = service.update(idRestaurant, idFood, dto);
             return ResponseEntity.status(202).body(food.foodToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @PutMapping("/move/{idFood}/{idPackage}")
-    public ResponseEntity<Object> move(@PathVariable("idFood") UUID idFood, @PathVariable("idPackage") UUID idParent, HttpSession session){
+    @PutMapping("/move/{idRestaurant}{idFood}/{idPackage}")
+    public ResponseEntity<Object> move(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idFood") UUID idFood, @PathVariable("idPackage") UUID idParent){
         try {
 
-            var food = service.move(idFood, idParent, session);
+            var food = service.move(idRestaurant, idFood, idParent);
             return ResponseEntity.status(202).body(food.foodToDTO());
 
         } catch (ExceptionController e) {
@@ -93,10 +93,10 @@ public class FoodController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idFood, HttpSession session){
+    @DeleteMapping("/delete/{idRestaurant}/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idFood){
         try {
-            service.delete(idFood, session);
+            service.delete(idRestaurant, idFood);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Alimento deletado com Sucesso!");

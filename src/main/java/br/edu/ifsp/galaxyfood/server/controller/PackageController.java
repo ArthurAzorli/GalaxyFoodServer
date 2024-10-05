@@ -22,10 +22,10 @@ public class PackageController {
     @Autowired
     private PackageService service;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InPackageDTO dto, HttpSession session){
+    @PostMapping("/create/{idRestaurant}")
+    public ResponseEntity<Object> create(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InPackageDTO dto){
         try {
-            var pack = service.create(dto, session);
+            var pack = service.create(idRestaurant, dto);
             return ResponseEntity.status(201).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -43,9 +43,9 @@ public class PackageController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<Object> getAll(HttpSession session){
+    public ResponseEntity<Object> getAll(){
         try {
-            var packages = service.getAll(session);
+            var packages = service.getAll();
 
             List<OutPackageDTO> list = new ArrayList<>();
             for (var pack : packages) list.add(pack.toDTO());
@@ -59,7 +59,7 @@ public class PackageController {
     @GetMapping("/get/restaurant/{id}")
     public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
         try {
-            var packages = service.getAll(idRestaurant);
+            var packages = service.getAllByRestaurant(idRestaurant);
 
             List<OutPackageDTO> list = new ArrayList<>();
             for (var pack : packages) list.add(pack.toDTO());
@@ -70,18 +70,8 @@ public class PackageController {
         }
     }
 
-    @GetMapping("/root")
-    public ResponseEntity<Object> getRoot(HttpSession session){
-        try {
-            var pack = service.getRoot(session);
-            return ResponseEntity.status(302).body(pack.toDTO());
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @GetMapping("/root/{id}")
-    public ResponseEntity<Object> getRoot(@PathVariable("id") UUID idRestaurant){
+    @GetMapping("/root/{idRestaurant}")
+    public ResponseEntity<Object> getRoot(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
             var pack = service.getRoot(idRestaurant);
             return ResponseEntity.status(302).body(pack.toDTO());
@@ -90,21 +80,21 @@ public class PackageController {
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idPackage, @RequestBody InPackageDTO dto, HttpSession session){
+    @PutMapping("/update/{idRestaurant}/{id}")
+    public ResponseEntity<Object> update(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idPackage, @RequestBody InPackageDTO dto){
         try {
-            var pack = service.update(idPackage, dto, session);
+            var pack = service.update(idRestaurant, idPackage, dto);
             return ResponseEntity.status(202).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @PutMapping("/move/{idPackage}/{idParent}")
-    public ResponseEntity<Object> move(@PathVariable("idPackage") UUID idPackage, @PathVariable("idParent") UUID idParent, HttpSession session){
+    @PutMapping("/move/{idRestaurant}/{idPackage}/{idParent}")
+    public ResponseEntity<Object> move(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idPackage") UUID idPackage, @PathVariable("idParent") UUID idParent){
         try {
 
-            var pack = service.move(idPackage, idParent, session);
+            var pack = service.move(idRestaurant, idPackage, idParent);
             return ResponseEntity.status(202).body(pack.toDTO());
 
         } catch (ExceptionController e) {
@@ -112,10 +102,10 @@ public class PackageController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idPackage, HttpSession session){
+    @DeleteMapping("/delete/{idRestaurant}/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idPackage){
         try {
-            service.delete(idPackage, session);
+            service.delete(idRestaurant, idPackage);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Pasta deletada com Sucesso!");

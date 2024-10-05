@@ -6,14 +6,14 @@ import br.edu.ifsp.galaxyfood.server.model.dto.InComboDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InComboItemDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class ComboService {
 
     private final RestaurantDAO restaurantDAO;
@@ -28,35 +28,18 @@ public class ComboService {
 
     private final BuyItemDAO buyItemDAO;
 
-    public ComboService(@NonNull RestaurantDAO restaurantDAO, @NonNull PackageDAO packageDAO, @NonNull FoodDAO foodDAO, @NonNull ComboItemDAO itemDAO, @NonNull ComboDAO comboDAO, @NonNull BuyItemDAO buyItemDAO) {
-        this.restaurantDAO = restaurantDAO;
-        this.packageDAO = packageDAO;
-        this.foodDAO = foodDAO;
-        this.itemDAO = itemDAO;
-        this.comboDAO = comboDAO;
-        this.buyItemDAO = buyItemDAO;
-    }
-
-    public Combo create(InComboDTO dto, HttpSession session) throws ExceptionController {
-
+    public Combo create(UUID idRestaurant, InComboDTO dto) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not sent!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
         if (dto.parent() == null) throw new ExceptionController(400, "Parent not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         if (!packageDAO.existsById(dto.parent())) throw new ExceptionController(404, "Pasta não encontrada!");
 
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         var parent = packageDAO.getPackageById(dto.parent());
 
         if (!parent.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar combos em uma pasta que não seja sua!");
@@ -64,24 +47,16 @@ public class ComboService {
         return comboDAO.save(new Combo(dto.name(), dto.price(), dto.image(), parent));
     }
 
-    public Combo update(UUID idCombo, InComboDTO dto, HttpSession session) throws ExceptionController {
-
+    public Combo update(UUID idRestaurant, UUID idCombo, InComboDTO dto) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (idCombo == null) throw new ExceptionController(400, "Combo id not sent!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not sent!");
         if (dto.price() == null) throw new ExceptionController(400, "Price not sent!");
         if (dto.image() == null) throw new ExceptionController(400, "Image not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
-
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 
         if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
 
@@ -97,23 +72,16 @@ public class ComboService {
 
     }
 
-    public Combo move(UUID idCombo, UUID idParent, HttpSession session) throws ExceptionController {
+    public Combo move(UUID idRestaurant, UUID idCombo, UUID idParent) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (idCombo == null) throw new ExceptionController(400, "Combo id not sent!");
         if (idParent == null) throw new ExceptionController(400, "Parent id not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         if (!packageDAO.existsById(idParent)) throw new ExceptionController(404, "Pasta não encontrada!");
 
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         var newParent = packageDAO.getPackageById(idParent);
 
         if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
@@ -133,46 +101,29 @@ public class ComboService {
         return comboDAO.getComboById(idCombo);
     }
 
-    public List<Combo> getAll(HttpSession session) throws ExceptionController {
-
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
-
-        return comboDAO.getAllByRestaurant(id);
+    public List<Combo> getAll() throws ExceptionController {
+        return comboDAO.findAll();
     }
 
-    public List<Combo> getAll(UUID idRestaurant, HttpSession session) throws ExceptionController {
-        if (idRestaurant == null) return getAll(session);
+    public List<Combo> getAllByRestaurant(UUID idRestaurant) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
         return comboDAO.getAllByRestaurant(idRestaurant);
     }
 
-    public Combo addFood(InComboItemDTO dto, HttpSession session) throws ExceptionController {
+    public Combo addFood(UUID idRestaurant, InComboItemDTO dto) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (dto.combo() == null) throw new ExceptionController(400, "Combo id not sent!");
         if (dto.food() == null) throw new ExceptionController(400, "Food id not sent!");
         if (dto.quantity() == null) throw  new ExceptionController(400, "Quantity not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
 
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         if (!comboDAO.existsById(dto.combo())) throw new ExceptionController(404, "Combo não encontrado!");
         if (!foodDAO.existsById(dto.food())) throw new ExceptionController(404, "Alimento não encontrado!");
 
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         var combo = comboDAO.getComboById(dto.combo());
         var food = foodDAO.getFoodById(dto.food());
 
@@ -193,23 +144,15 @@ public class ComboService {
         return comboDAO.getComboById(dto.combo());
     }
 
-    public Combo remFood(UUID idItem, HttpSession session) throws ExceptionController {
-
+    public Combo remFood(UUID idRestaurant, UUID idItem) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (idItem == null) throw new ExceptionController(400, "Combo Item id not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
-
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         if (!itemDAO.existsById(idItem)) throw new ExceptionController(404, "Alimento do combo não encontrado!");
 
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         var item = itemDAO.getComboItemById(idItem);
 
         if (!item.getCombo().getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode remover alimentos de combos que não sejam seus!");
@@ -222,20 +165,13 @@ public class ComboService {
         return combo;
     }
 
-    public void delete(UUID idCombo, HttpSession session) throws ExceptionController{
+    public void delete(UUID idRestaurant, UUID idCombo) throws ExceptionController{
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (idCombo == null) throw new ExceptionController(400, "Combo id not sent!");
 
-        if (session.getAttribute("user") == null) throw new ExceptionController(498, "Você não está Logado!");
-        if (!session.getAttribute("type").equals("restaurant")) throw new ExceptionController(401, "Você não está Logado em uma conta de Restaurante!");
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
-        var id = (UUID) session.getAttribute("user");
-
-        if (!restaurantDAO.existsById(id)) {
-            session.removeAttribute("user");
-            throw new ExceptionController(412, "Restaurante não cadastrado!");
-        }
-
-        var restaurant = restaurantDAO.getRestaurantById(id);
+        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 
         if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
 
