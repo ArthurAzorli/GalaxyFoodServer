@@ -43,7 +43,7 @@ public class PackageController {
     }
 
     @GetMapping("/get/{idRestaurant}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
+    public ResponseEntity<Object> getAll(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
             var packages = service.getAllByRestaurant(idRestaurant);
 

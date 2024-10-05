@@ -89,7 +89,7 @@ public class PackageService {
         final var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         final var pack = packageDAO.getPackageById(idPackage);
 
-        if (restaurant.getId().equals(pack.getRestaurant().getId())) throw new ExceptionController(401, "Esta pasta não pertence a este Restaurante!");
+        if (!restaurant.getId().equals(pack.getRestaurant().getId())) throw new ExceptionController(401, "Esta pasta não pertence a este Restaurante!");
 
         return pack;
     }
