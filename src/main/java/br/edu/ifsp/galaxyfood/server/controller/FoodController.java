@@ -33,32 +33,18 @@ public class FoodController {
         }
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id){
+    @GetMapping("/get/{idRestaurant}/{id}")
+    public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
-            var food = service.get(id);
+            var food = service.get(idRestaurant, id);
             return ResponseEntity.status(302).body(food.foodToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(){
-        try {
-            var foods = service.getAll();
-
-            List<OutFoodDTO> list = new ArrayList<>();
-            for (var food : foods) list.add(food.foodToDTO());
-
-            return ResponseEntity.status(302).body(list);
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
+    @GetMapping("/get/{idRestaurant}")
+    public ResponseEntity<Object> getAll(@PathVariable("idRestaurantd") UUID idRestaurant){
         try {
             var foods = service.getAllByRestaurant(idRestaurant);
 

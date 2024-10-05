@@ -79,10 +79,19 @@ public class PackageService {
         return packageDAO.save(selectedPackage);
     }
 
-    public Package get (UUID idPackage) throws ExceptionController {
+    public Package get (UUID idRestaurant, UUID idPackage) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
         if (idPackage == null) throw new ExceptionController(400, "Package id not sent!");
+
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(404, "Restaurante não encontrado!");
         if (!packageDAO.existsById(idPackage)) throw new ExceptionController(404, "Pasta não encontrada!");
-        return packageDAO.getPackageById(idPackage);
+
+        final var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
+        final var pack = packageDAO.getPackageById(idPackage);
+
+        if (restaurant.getId().equals(pack.getRestaurant().getId())) throw new ExceptionController(401, "Esta pasta não pertence a este Restaurante!");
+
+        return pack;
     }
 
     public Package getRoot (UUID idRestaurant) throws ExceptionController {
@@ -95,10 +104,6 @@ public class PackageService {
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant id not sent!");
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(404, "Restaurante não encontrado!");
         return packageDAO.getAllByRestaurant(idRestaurant);
-    }
-
-    public List<Package> getAll() throws ExceptionController {
-        return packageDAO.findAll();
     }
 
     public void delete(UUID idRestaurant, UUID idPackage) throws ExceptionController {

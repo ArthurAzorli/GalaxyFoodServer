@@ -32,31 +32,17 @@ public class PackageController {
         }
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id){
+    @GetMapping("/get/{idRestaurant}/{id}")
+    public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
-            var pack = service.get(id);
+            var pack = service.get(idRestaurant, id);
             return ResponseEntity.status(302).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(){
-        try {
-            var packages = service.getAll();
-
-            List<OutPackageDTO> list = new ArrayList<>();
-            for (var pack : packages) list.add(pack.toDTO());
-
-            return ResponseEntity.status(302).body(list);
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @GetMapping("/get/restaurant/{id}")
+    @GetMapping("/get/{idRestaurant}")
     public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
         try {
             var packages = service.getAllByRestaurant(idRestaurant);

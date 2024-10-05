@@ -33,32 +33,18 @@ public class ComboController {
         }
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id){
+    @GetMapping("/get/{idRestaurant}/{id}")
+    public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
-            var combo = service.get(id);
+            var combo = service.get(idRestaurant, id);
             return ResponseEntity.status(302).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(){
-        try {
-            var combos = service.getAll();
-
-            List<OutComboDTO> list = new ArrayList<>();
-            for (var combo : combos) list.add(combo.comboToDTO());
-
-            return ResponseEntity.status(302).body(list);
-        } catch (ExceptionController e) {
-            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        }
-    }
-
-    @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAll(@PathVariable("id") UUID idRestaurant){
+    @GetMapping("/get/{idRestaurant}")
+    public ResponseEntity<Object> getAll(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
             var combos = service.getAllByRestaurant(idRestaurant);
 

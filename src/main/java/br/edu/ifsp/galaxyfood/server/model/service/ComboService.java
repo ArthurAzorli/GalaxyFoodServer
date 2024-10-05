@@ -95,14 +95,19 @@ public class ComboService {
         return comboDAO.save(combo);
     }
 
-    public Combo get(UUID idCombo) throws ExceptionController {
-        if (idCombo == null) throw new ExceptionController(400, "Combo id not send!");
-        if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
-        return comboDAO.getComboById(idCombo);
-    }
+    public Combo get(UUID idRestaurant, UUID idCombo) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
+        if (idCombo == null) throw new ExceptionController(400, "Combo ID not send!");
 
-    public List<Combo> getAll() throws ExceptionController {
-        return comboDAO.findAll();
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(404, "Restaurante não encontrado!");
+        if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
+
+        final var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
+        final var combo = comboDAO.getComboById(idCombo);
+
+        if (!restaurant.getId().equals(combo.getParent().getRestaurant().getId())) throw new ExceptionController(401, "Este combo não pertence a este Restaurante!");
+
+        return combo;
     }
 
     public List<Combo> getAllByRestaurant(UUID idRestaurant) throws ExceptionController {

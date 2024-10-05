@@ -96,14 +96,19 @@ public class FoodService {
         return foodDAO.save(food);
     }
 
-    public Food get(UUID idFood) throws ExceptionController {
-        if (idFood == null) throw new ExceptionController(400, "Food id not send!");
-        if (!foodDAO.existsById(idFood)) throw new ExceptionController(404, "Alimento não encontrado!");
-        return foodDAO.getFoodById(idFood);
-    }
+    public Food get(UUID idRestaurant, UUID idFood) throws ExceptionController {
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
+        if (idFood == null) throw new ExceptionController(400, "Food ID not send!");
 
-    public List<Food> getAll() {
-        return foodDAO.findAll();
+        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(404, "Restaurante não encontrado!");
+        if (!foodDAO.existsById(idFood)) throw new ExceptionController(404, "Alimento não encontrado!");
+
+        final var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
+        final var food = foodDAO.getFoodById(idFood);
+
+        if (!restaurant.getId().equals(food.getParent().getRestaurant().getId())) throw new ExceptionController(401, "Este alimento não pertence a este Restaurante!");
+
+        return food;
     }
 
     public List<Food> getAllByRestaurant(UUID idRestaurant) {
