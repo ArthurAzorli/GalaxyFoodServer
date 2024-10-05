@@ -32,7 +32,7 @@ public class BuyController {
     }
 
     @GetMapping("/get/{idUser}/{id}")
-public ResponseEntity<Object> get(@PathVariable("idUser") UUID idUser, @PathVariable("id") UUID id, @RequestParam(name = "typeUser") String typeUser){
+    public ResponseEntity<Object> get(@PathVariable("idUser") UUID idUser, @PathVariable("id") UUID id, @RequestParam(name = "typeUser") String typeUser){
         try {
             var buy = service.get(idUser, id, typeUser);
             return ResponseEntity.status(302).body(buy.toDTO());

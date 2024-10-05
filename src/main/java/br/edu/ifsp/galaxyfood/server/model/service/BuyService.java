@@ -154,6 +154,8 @@ public class BuyService {
 
         var buy = buyDAO.getBuyById(idBuy);
 
+        if (buy.getOrderStatus().getCode() >= 3) throw new ExceptionController(401, "Impossível cancelar Agora!");
+
         buy.setOrderStatus(OrderStatus.CANCELED);
         return buyDAO.save(buy);
     }
