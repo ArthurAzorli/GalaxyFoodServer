@@ -2,6 +2,7 @@ package br.edu.ifsp.galaxyfood.server.controller;
 
 
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantOwnerDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.RestaurantOwnerService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
@@ -51,9 +52,9 @@ public class RestaurantOwnerController {
     }
 
     @DeleteMapping("/delete/{idRestaurant}")
-    public ResponseEntity<Object> delete(@PathVariable("idRestaurant") UUID idRestaurant){
+    public ResponseEntity<Object> delete(@RequestBody LoginDTO dto){
         try {
-            service.delete(idRestaurant);
+            service.delete(dto);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Dono deletado com Sucesso!");

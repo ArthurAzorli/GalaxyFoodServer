@@ -2,8 +2,10 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.RestaurantOwner;
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantOwnerDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantOwnerDAO;
+import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -56,12 +58,15 @@ public class RestaurantOwnerService {
         return repository.save(owner);
     }
 
-    public void delete(UUID idRestaurant) throws ExceptionController{
-        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
+    public void delete(LoginDTO dto) throws ExceptionController{
+        if (dto.login() == null || dto.login().isEmpty()) throw new ExceptionController(400, "Login not sent!");
+        if (dto.password() == null || dto.password().isEmpty()) throw new ExceptionController(400, "Password not sent!");
 
-        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
+        if (!restaurantDAO.existsRestaurantByEmail(dto.login())) throw new ExceptionController(404, "Restaurante não encontrado!");
 
-        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
+        var restaurant = restaurantDAO.getRestaurantByEmail(dto.login());
+
+        if (!restaurant.getPassword().equals(Cripto.md5(dto.password()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
 
         if (restaurantDAO.countByOwner(restaurant.getOwner())>1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
 

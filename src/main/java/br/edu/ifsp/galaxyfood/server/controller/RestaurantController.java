@@ -174,10 +174,10 @@ public class RestaurantController {
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID id){
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> delete(@RequestBody LoginDTO dto){
         try {
-            service.delete(id);
+            service.delete(dto);
 
             var data = new HashMap<String, Object>();
             data.put("message", "Restaurante deletado com Sucesso!");

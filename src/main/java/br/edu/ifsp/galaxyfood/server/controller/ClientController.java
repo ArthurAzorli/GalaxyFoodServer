@@ -131,8 +131,7 @@ public class ClientController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> delete(
-            @RequestBody LoginDTO dto){
+    public ResponseEntity<Object> delete(@RequestBody LoginDTO dto){
         try {
             service.delete(dto);
 

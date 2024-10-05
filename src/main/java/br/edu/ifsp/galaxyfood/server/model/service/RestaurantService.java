@@ -3,6 +3,7 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 import br.edu.ifsp.galaxyfood.server.model.domain.*;
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InScoreDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
@@ -19,6 +20,8 @@ public class RestaurantService {
     private final RestaurantDAO restaurantDAO;
 
     private final RestaurantOwnerDAO ownerDAO;
+
+    private final PackageDAO packageDAO;
 
     private final AddressDAO addressDAO;
 
@@ -219,20 +222,29 @@ public class RestaurantService {
         return restaurantDAO.save(restaurant);
     }
 
-    public void delete(UUID id) throws ExceptionController{
-        if (id == null) throw new ExceptionController(400, "ID not sent!");
+    public void delete(LoginDTO dto) throws ExceptionController{
+        if (dto.login() == null || dto.login().isEmpty()) throw new ExceptionController(400, "Login not sent!");
+        if (dto.password() == null || dto.password().isEmpty()) throw new ExceptionController(400, "Password not sent!");
 
-        if (!restaurantDAO.existsById(id))  throw new ExceptionController(412, "Restaurante não cadastrado!");
+        if (!restaurantDAO.existsRestaurantByEmail(dto.login())) throw new ExceptionController(404, "Restaurante não encontrado!");
 
-        for (var buy : buyDAO.getAllByRestaurant(id)){
+        var restaurant = restaurantDAO.getRestaurantByEmail(dto.login());
+
+        if (!restaurant.getPassword().equals(Cripto.md5(dto.password()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
+
+
+        for (var buy : buyDAO.getAllByRestaurant(restaurant.getId())){
             buy.setClient(null);
             buy.setSentAddress(null);
             buyDAO.save(buy);
             buyDAO.delete(buy);
         }
 
-        restaurantDAO.deleteById(id);
+        final var root = packageDAO.getRoot(restaurant.getId());
+        if (root != null) packageDAO.delete(root);
 
-        if (restaurantDAO.existsById(id)) throw new ExceptionController(500, "Erro ao deletar Restaurante!");
+        restaurantDAO.delete(restaurant);
+
+        if (restaurantDAO.existsById(restaurant.getId())) throw new ExceptionController(500, "Erro ao deletar Restaurante!");
     }
 }

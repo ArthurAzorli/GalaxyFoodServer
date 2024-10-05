@@ -44,7 +44,7 @@ public class FoodController {
     }
 
     @GetMapping("/get/{idRestaurant}")
-    public ResponseEntity<Object> getAll(@PathVariable("idRestaurantd") UUID idRestaurant){
+    public ResponseEntity<Object> getAll(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
             var foods = service.getAllByRestaurant(idRestaurant);
 
@@ -67,7 +67,7 @@ public class FoodController {
         }
     }
 
-    @PutMapping("/move/{idRestaurant}{idFood}/{idPackage}")
+    @PutMapping("/move/{idRestaurant}/{idFood}/{idPackage}")
     public ResponseEntity<Object> move(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idFood") UUID idFood, @PathVariable("idPackage") UUID idParent){
         try {
 

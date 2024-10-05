@@ -190,7 +190,7 @@ public class ClientService {
 
         var client = clientDAO.getByEmail(dto.login());
 
-        if (!client.getPassword().equals(Cripto.md5(dto.login()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
+        if (!client.getPassword().equals(Cripto.md5(dto.password()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
 
         for (var buy : buyDAO.getAllByClient(client.getId())){
             buy.setSentAddress(null);
