@@ -55,23 +55,23 @@ public class BuyController {
     }
 
     @PutMapping("/updatestatus/{idRestaurant}/{id}")
-    public ResponseEntity<Object> updateStatus(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id, @RequestParam int orderStatus){
+    public ResponseEntity<Object> updateStatus(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id, @RequestParam(name = "status") int orderStatus){
         try {
             var status = OrderStatus.getOrderStatus(orderStatus);
             var buy = service.updateOrderStatus(idRestaurant, id, status);
 
-            return ResponseEntity.status(202).body(buy);
+            return ResponseEntity.status(202).body(buy.toDTO());
         }catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
     @PutMapping("/cancel/{idClient}/{id}")
-    public ResponseEntity<Object> cancel(@PathVariable("idRestaurant") UUID idClient, @PathVariable("id") UUID id){
+    public ResponseEntity<Object> cancel(@PathVariable("idClient") UUID idClient, @PathVariable("id") UUID id){
         try {
             var buy = service.cancel(idClient, id);
 
-            return ResponseEntity.status(202).body(buy);
+            return ResponseEntity.status(202).body(buy.toDTO());
         }catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }

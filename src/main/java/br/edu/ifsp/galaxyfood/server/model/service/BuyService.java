@@ -150,11 +150,11 @@ public class BuyService {
 
         if (!clientDAO.existsById(idClient)) throw new ExceptionController(412, "Cliente não cadastrado!");
 
-        if (!buyDAO.existsById(idBuy)) throw new ExceptionController(404, "Compra não econtrada!");
+        if (!buyDAO.existsById(idBuy)) throw new ExceptionController(404, "Compra não encontrada!");
 
         var buy = buyDAO.getBuyById(idBuy);
 
-        if (buy.getOrderStatus().getCode() >= 3) throw new ExceptionController(401, "Impossível cancelar Agora!");
+        if (buy.getOrderStatus().getCode() >= 3 || buy.getOrderStatus().getCode() == 0) throw new ExceptionController(401, "Impossível cancelar Agora!");
 
         buy.setOrderStatus(OrderStatus.CANCELED);
         return buyDAO.save(buy);
