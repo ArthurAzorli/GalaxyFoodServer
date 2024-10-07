@@ -37,7 +37,7 @@ public class FoodController {
     public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
             var food = service.get(idRestaurant, id);
-            return ResponseEntity.status(302).body(food.foodToDTO());
+            return ResponseEntity.status(200).body(food.foodToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
@@ -51,7 +51,7 @@ public class FoodController {
             List<OutFoodDTO> list = new ArrayList<>();
             for (var food : foods) list.add(food.foodToDTO());
 
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }

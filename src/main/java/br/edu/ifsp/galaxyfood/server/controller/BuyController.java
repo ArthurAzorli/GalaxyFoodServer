@@ -35,7 +35,7 @@ public class BuyController {
     public ResponseEntity<Object> get(@PathVariable("idUser") UUID idUser, @PathVariable("id") UUID id, @RequestParam(name = "typeUser") String typeUser){
         try {
             var buy = service.get(idUser, id, typeUser);
-            return ResponseEntity.status(302).body(buy.toDTO());
+            return ResponseEntity.status(200).body(buy.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
@@ -48,7 +48,7 @@ public class BuyController {
 
             List<OutBuyDTO> list = new ArrayList<>();
             for (var buy : buys) list.add(buy.toDTO());
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }

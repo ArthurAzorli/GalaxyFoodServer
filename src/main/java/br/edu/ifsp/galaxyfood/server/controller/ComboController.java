@@ -37,7 +37,7 @@ public class ComboController {
     public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
             var combo = service.get(idRestaurant, id);
-            return ResponseEntity.status(302).body(combo.comboToDTO());
+            return ResponseEntity.status(200).body(combo.comboToDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
@@ -51,7 +51,7 @@ public class ComboController {
             List<OutComboDTO> list = new ArrayList<>();
             for (var combo : combos) list.add(combo.comboToDTO());
 
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }

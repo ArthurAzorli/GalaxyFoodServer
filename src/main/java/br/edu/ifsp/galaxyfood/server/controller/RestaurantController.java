@@ -54,7 +54,7 @@ public class RestaurantController {
     public ResponseEntity<Object> get(@PathVariable("id") UUID id){
         try {
             var restaurant = service.get(id);
-            return ResponseEntity.status(302).body(restaurant.toDTO());
+            return ResponseEntity.status(200).body(restaurant.toDTO());
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -67,20 +67,20 @@ public class RestaurantController {
             var restaurants = service.getAll();
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/getOfLocal")
+    @GetMapping("/getLocal")
     public ResponseEntity<Object> getAll(@RequestParam(value = "address") UUID address){
         try {
             var restaurants = service.getAllOfLocal(address);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
@@ -93,20 +93,20 @@ public class RestaurantController {
             var restaurants = service.search(text);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/searchOfLocal")
+    @GetMapping("/searchLocal")
     public ResponseEntity<Object> search(@RequestParam(value = "text") String text, @RequestParam(value = "address") UUID address){
         try {
             var restaurants = service.searchOfLocal(text, address);
             List<OutRestaurantDTO> list = new ArrayList<>();
             for (var restaurant : restaurants) list.add(restaurant.toDTO());
-            return ResponseEntity.status(302).body(list);
+            return ResponseEntity.status(200).body(list);
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));

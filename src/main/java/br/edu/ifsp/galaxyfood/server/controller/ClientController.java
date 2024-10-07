@@ -51,7 +51,7 @@ public class ClientController {
     public ResponseEntity<Object> get(@PathVariable("id") UUID id){
         try {
             var client = service.get(id);
-            return ResponseEntity.status(302).body(client.toDTO());
+            return ResponseEntity.status(200).body(client.toDTO());
 
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
