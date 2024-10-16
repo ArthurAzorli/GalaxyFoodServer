@@ -182,7 +182,7 @@ public class ClientService {
         return client;
     }
 
-    public void delete(LoginDTO dto) throws ExceptionController{
+    public void delete(LoginDTO dto) throws ExceptionController {
         if (dto.login() == null || dto.login().isEmpty()) throw new ExceptionController(400, "Login not send!");
         if (dto.password() == null || dto.password().isEmpty()) throw new ExceptionController(400, "Password not send!");
 
@@ -196,6 +196,15 @@ public class ClientService {
             buy.setSentAddress(null);
             buy.setClient(null);
             buyDAO.save(buy);
+        }
+
+        final var adresses = client.getAddresses();
+
+        client.getAddresses().clear();
+        clientDAO.save(client);
+
+        for (var address : adresses){
+            addressDAO.delete(address);
         }
 
         clientDAO.deleteById(client.getId());
