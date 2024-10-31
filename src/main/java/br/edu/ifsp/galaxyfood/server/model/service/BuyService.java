@@ -62,13 +62,13 @@ public class BuyService {
 
         List<BuyItem> buyItems = new ArrayList<>();
         for (var itemDTO : dto.items()){
-            if (itemDTO.idItem() == null) throw new ExceptionController(400, "Package item id not sent!");
+            if (itemDTO.item() == null) throw new ExceptionController(400, "Package item id not sent!");
             if (itemDTO.quantity() == null) throw new ExceptionController(400, "Quantity not sent!");
 
-            if (!packageItemDAO.existsById(itemDTO.idItem())) throw new ExceptionController(404, "Produto não encontrado!");
+            if (!packageItemDAO.existsById(itemDTO.item())) throw new ExceptionController(404, "Produto não encontrado!");
             if (itemDTO.quantity() <= 0) throw new ExceptionController(406, "Quantidade inválida!");
 
-            var item = packageItemDAO.getPackageItemById(itemDTO.idItem());
+            var item = packageItemDAO.getPackageItemById(itemDTO.item());
 
             var buyItem = itemDAO.save(new BuyItem(buy, item, itemDTO.quantity()));
 

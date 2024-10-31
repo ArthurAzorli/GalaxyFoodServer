@@ -153,9 +153,9 @@ public class RestaurantController {
     }
 
     @PutMapping("/score/{idRestaurant}/{idClient}")
-    public ResponseEntity<Object> score (@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idClient") UUID idClient,  @RequestBody InScoreDTO dto){
+    public ResponseEntity<Object> score (@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idClient") UUID idClient,  @RequestParam(name = "score") Double score){
         try {
-            var restaurant = service.score(idRestaurant, idClient, dto);
+            var restaurant = service.score(idRestaurant, idClient, score);
             return ResponseEntity.status(202).body(restaurant.toDTO());
 
         } catch (ExceptionController e) {

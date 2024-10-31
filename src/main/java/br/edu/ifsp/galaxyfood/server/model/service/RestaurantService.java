@@ -2,7 +2,6 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.*;
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantDTO;
-import br.edu.ifsp.galaxyfood.server.model.dto.InScoreDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
@@ -10,6 +9,7 @@ import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -197,9 +197,9 @@ public class RestaurantService {
         return restaurant;
     }
 
-    public Restaurant score(UUID idRestaurant, UUID idClient, InScoreDTO dto) throws ExceptionController{
+    public Restaurant score(UUID idRestaurant, UUID idClient, Double value) throws ExceptionController{
         if (idClient == null) throw new ExceptionController(400, "Client ID not sent!");
-        if (dto.score() == null) throw new ExceptionController(400, "Score value not sent!");
+        if (value == null) throw new ExceptionController(400, "Score value not sent!");
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
 
         if (!clientDAO.existsById(idClient)) throw new ExceptionController(412, "Cliente não cadastrado!");
@@ -210,12 +210,12 @@ public class RestaurantService {
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 
         for (var score : restaurant.getScore()) if (score.getClient().getId().equals(client.getId())) {
-            score.setScore(dto.score());
+            score.setScore(BigDecimal.valueOf(value));
             scoreDAO.save(score);
             return restaurantDAO.getRestaurantById(restaurant.getId());
         }
 
-        var score = scoreDAO.save(new Score(dto.score(), client, restaurant));
+        var score = scoreDAO.save(new Score(BigDecimal.valueOf(value), client, restaurant));
 
         restaurant.getScore().add(score);
 
