@@ -64,8 +64,14 @@ public class Combo extends PackageItem {
 
 
     public OutComboDTO comboToDTO(){
+        List<Integer> bytes = new ArrayList<>();
+        if (image != null) {
+            for (byte b : image) {
+                bytes.add(b & 0xFF);
+            }
+        }
         List<OutComboItemDTO> list = new ArrayList<>();
         for (var item : items) list.add(item.toDTO());
-        return new OutComboDTO(id, name, price, image, parent.getId(), list);
+        return new OutComboDTO(id, name, price, bytes, parent.getId(), list);
     }
 }

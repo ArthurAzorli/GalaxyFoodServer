@@ -34,7 +34,7 @@ public class PackageService {
 
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
 
-        return packageDAO.save(new Package(dto.name(), dto.image(), restaurant, parent));
+        return packageDAO.save(new Package(dto.name(), restaurant, parent));
     }
 
     public Package update (UUID idRestaurant, UUID idPackage, InPackageDTO dto) throws ExceptionController {
@@ -52,7 +52,6 @@ public class PackageService {
         if (!selectedPackage.getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode modificar pastas que não sejam suas!");
 
         selectedPackage.setName(dto.name());
-        selectedPackage.setImage(dto.image());
 
         return packageDAO.save(selectedPackage);
     }

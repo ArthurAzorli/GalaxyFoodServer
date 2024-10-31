@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -34,7 +36,13 @@ public abstract class PackageItem implements Serializable {
     protected byte[] image;
 
     public OutPackageItemDTO toDTO(){
-        return new OutPackageItemDTO(id, name, price, image, parent.getId());
+        List<Integer> bytes = new ArrayList<>();
+        if (image != null) {
+            for (byte b : image) {
+                bytes.add(b & 0xFF);
+            }
+        }
+        return new OutPackageItemDTO(id, name, price, bytes, parent.getId());
     }
 
 
