@@ -119,18 +119,18 @@ public class ComboService {
     public Combo addFood(UUID idRestaurant, InComboItemDTO dto) throws ExceptionController {
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (dto.combo() == null) throw new ExceptionController(400, "Combo id not sent!");
-        if (dto.food() == null) throw new ExceptionController(400, "Food id not sent!");
+        if (dto.item() == null) throw new ExceptionController(400, "Food id not sent!");
         if (dto.quantity() == null) throw  new ExceptionController(400, "Quantity not sent!");
 
 
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
 
         if (!comboDAO.existsById(dto.combo())) throw new ExceptionController(404, "Combo não encontrado!");
-        if (!foodDAO.existsById(dto.food())) throw new ExceptionController(404, "Alimento não encontrado!");
+        if (!foodDAO.existsById(dto.item())) throw new ExceptionController(404, "Alimento não encontrado!");
 
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
         var combo = comboDAO.getComboById(dto.combo());
-        var food = foodDAO.getFoodById(dto.food());
+        var food = foodDAO.getFoodById(dto.item());
 
         if (!combo.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos a combos que não sejam seus!");
         if (!food.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode adicionar alimentos que não sejam seus!");
