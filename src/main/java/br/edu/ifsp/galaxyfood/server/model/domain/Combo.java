@@ -17,7 +17,7 @@ import java.util.UUID;
 @Entity
 public class Combo extends PackageItem {
 
-    @OneToMany
+    @OneToMany(mappedBy = "combo", cascade = CascadeType.REMOVE)
     private List<ComboItem> items = new ArrayList<>();
 
     public Combo(UUID id, String name, BigDecimal price, byte[] image, Package parent, List<ComboItem> items) {

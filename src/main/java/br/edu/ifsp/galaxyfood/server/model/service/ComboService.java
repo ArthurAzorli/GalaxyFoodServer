@@ -149,38 +149,6 @@ public class ComboService {
         return comboDAO.getComboById(dto.combo());
     }
 
-    public Combo updateFood(UUID idRestaurant, UUID idCombo, ComboItem item) throws ExceptionController {
-        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
-        if (idCombo == null) throw new ExceptionController(400, "Combo ID not sent!");
-        if (item == null) throw new ExceptionController(400, "Combo Item not sent!");
-        if (item.getId() == null) throw new ExceptionController(400, "Combo Item ID not sent!");
-
-        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
-
-        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
-
-        if (!comboDAO.existsById(idCombo)) throw new ExceptionController(404, "Combo não encontrado!");
-
-        var combo = comboDAO.getComboById(idCombo);
-
-        if (!combo.getParent().getRestaurant().getId().equals(restaurant.getId())) throw new ExceptionController(401, "Você não pode alterar alimentos que não sejam seus!");
-
-        boolean result = false;
-        for (var i : combo.getItems()){
-            if (i.getId().equals(item.getId())) {
-                result = true;
-                break;
-            }
-        }
-
-        if (!result) throw  new ExceptionController(401, "Este item não pertece a este Combo!");
-        if (item.getQuantity() <= 0) return remFood(idRestaurant, item.getId());
-
-        itemDAO.save(item);
-        return comboDAO.getComboById(idCombo);
-
-    }
-
     public Combo remFood(UUID idRestaurant, UUID idItem) throws ExceptionController {
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not sent!");
         if (idItem == null) throw new ExceptionController(400, "Combo Item id not sent!");
