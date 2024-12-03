@@ -1,5 +1,6 @@
 package br.edu.ifsp.galaxyfood.server.controller;
 
+import br.edu.ifsp.galaxyfood.server.model.domain.Restaurant;
 import br.edu.ifsp.galaxyfood.server.model.dto.*;
 import br.edu.ifsp.galaxyfood.server.model.service.RestaurantService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
@@ -114,7 +115,7 @@ public class RestaurantController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InRestaurantDTO dto){
+    public ResponseEntity<Object> update(@PathVariable("id") UUID id, @RequestBody InEditRestaurant dto){
         try {
 
             var restaurant = service.update(id, dto);

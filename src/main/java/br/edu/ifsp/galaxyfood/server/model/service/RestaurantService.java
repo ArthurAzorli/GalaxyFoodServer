@@ -1,8 +1,10 @@
 package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.*;
+import br.edu.ifsp.galaxyfood.server.model.dto.InEditRestaurant;
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.OutRestaurantDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
@@ -110,18 +112,18 @@ public class RestaurantService {
         return restaurantDAO.searchOfLocal(text.toLowerCase(), address.getCity(), address.getState());
     }
 
-    public Restaurant update(UUID id, InRestaurantDTO dto) throws ExceptionController{
+    public Restaurant update(UUID id, InEditRestaurant dto) throws ExceptionController{
         if (id == null) throw new ExceptionController(400, "ID not sent!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not sent!");
         if (dto.email() == null) throw new ExceptionController(400, "Email not sent!");
         if (dto.specialty() == null) throw new ExceptionController(400, "Specialty not sent!");
         if (dto.address() == null) throw new ExceptionController(400, "Address not sent!");
-        if (dto.address().street() == null) throw new ExceptionController(400, "Street not sent!");
-        if (dto.address().number() == null) throw new ExceptionController(400, "Number not sent!");
-        if (dto.address().neighborhood() == null) throw new ExceptionController(400, "Neighborhood not sent!");
-        if (dto.address().city() == null) throw new ExceptionController(400, "City not sent!");
-        if (dto.address().state() == null) throw new ExceptionController(400, "State not sent!");
-        if (dto.address().cep() == null) throw new ExceptionController(400, "CEP not sent!");
+        if (dto.address().getStreet() == null) throw new ExceptionController(400, "Street not sent!");
+        if (dto.address().getNumber() == null) throw new ExceptionController(400, "Number not sent!");
+        if (dto.address().getNeighborhood() == null) throw new ExceptionController(400, "Neighborhood not sent!");
+        if (dto.address().getCity() == null) throw new ExceptionController(400, "City not sent!");
+        if (dto.address().getState() == null) throw new ExceptionController(400, "State not sent!");
+        if (dto.address().getCep() == null) throw new ExceptionController(400, "CEP not sent!");
 
 
         if (!restaurantDAO.existsById(id)) throw new ExceptionController(412, "Restaurante não cadastrado!");
@@ -133,12 +135,12 @@ public class RestaurantService {
         restaurant.setEmail(dto.email());
         restaurant.setImage(dto.image());
         restaurant.setSpecialty(dto.specialty());
-        address.setStreet(dto.address().street());
-        address.setNumber(dto.address().number());
-        address.setNeighborhood(dto.address().neighborhood());
-        address.setCity(dto.address().city());
-        address.setState(dto.address().state());
-        address.setCep(dto.address().cep());
+        address.setStreet(dto.address().getStreet());
+        address.setNumber(dto.address().getNumber());
+        address.setNeighborhood(dto.address().getNeighborhood());
+        address.setCity(dto.address().getCity());
+        address.setState(dto.address().getState());
+        address.setCep(dto.address().getCep());
 
         addressDAO.save(address);
         return restaurantDAO.save(restaurant);
