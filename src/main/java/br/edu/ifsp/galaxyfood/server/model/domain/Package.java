@@ -31,10 +31,10 @@ public class Package implements Serializable {
     @JoinColumn(name = "parent_package", referencedColumnName = "id")
     private Package parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     private List<Package> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     private List<PackageItem> items = new ArrayList<>();
 
     public Package(UUID id, String name, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {

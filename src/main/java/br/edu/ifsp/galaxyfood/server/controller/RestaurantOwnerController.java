@@ -44,11 +44,7 @@ public class RestaurantOwnerController {
     @GetMapping("/exists/{cpf}")
     public ResponseEntity<Object> exists(@PathVariable("cpf") String cpf){
         try {
-            var result = service.exists(cpf);
-
-            var data = new HashMap<String, Object>();
-            data.put("result", result);
-
+            var data = service.exists(cpf);
             return ResponseEntity.status(200).body(data);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));

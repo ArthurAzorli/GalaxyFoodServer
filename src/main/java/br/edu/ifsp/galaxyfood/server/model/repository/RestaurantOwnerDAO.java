@@ -16,4 +16,7 @@ public interface RestaurantOwnerDAO extends JpaRepository<RestaurantOwner, UUID>
 
     @Query(value = "SELECT r FROM RestaurantOwner r WHERE r.id = ?1")
     RestaurantOwner getOwnerById(UUID id);
+
+    @Query(value = "SELECT r FROM RestaurantOwner r WHERE r.cpf = ?1")
+    RestaurantOwner getOwnerByCpf(String cpf);
 }

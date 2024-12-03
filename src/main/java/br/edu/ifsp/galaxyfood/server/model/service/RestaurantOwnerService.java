@@ -10,6 +10,7 @@ import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -19,6 +20,8 @@ public class RestaurantOwnerService {
     private final RestaurantOwnerDAO repository;
 
     private final RestaurantDAO restaurantDAO;
+
+    private final RestaurantService restaurantService;
 
     public RestaurantOwner create(InRestaurantOwnerDTO dto) throws ExceptionController {
 
@@ -43,8 +46,17 @@ public class RestaurantOwnerService {
         return repository.getOwnerById(id);
     }
 
-    public boolean exists(String cpf){
-        return repository.existsByCpf(cpf);
+    public HashMap<String, Object> exists(String cpf){
+        var data = new HashMap<String, Object>();
+
+        final var result = repository.existsByCpf(cpf);
+        data.put("result", result);
+
+        if (result){
+            UUID id = repository.getOwnerByCpf(cpf).getId();
+            data.put("id", id);
+        }
+        return data;
     }
 
     public RestaurantOwner update(UUID idRestaurant, InRestaurantOwnerDTO dto) throws ExceptionController{
@@ -74,7 +86,7 @@ public class RestaurantOwnerService {
 
         if (restaurantDAO.countByOwner(restaurant.getOwner())>1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
 
-        restaurantDAO.delete(restaurant);
+        restaurantService.delete(dto);
         repository.delete(restaurant.getOwner());
 
         if (repository.existsById(restaurant.getOwner().getId())) throw new ExceptionController(500, "Erro ao deletar Cliente!");
