@@ -23,15 +23,11 @@ public class Package implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] image;
-
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false, referencedColumnName = "id")
     private Restaurant restaurant;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "parent_package", referencedColumnName = "id")
     private Package parent;
 
@@ -41,27 +37,24 @@ public class Package implements Serializable {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE)
     private List<PackageItem> items = new ArrayList<>();
 
-    public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {
+    public Package(UUID id, String name, Restaurant restaurant, Package parent, List<Package> children, List<PackageItem> items) {
         this.id = id;
         this.name = name;
-        this.image = image;
         this.restaurant = restaurant;
         this.parent = parent;
         this.children = children;
         this.items = items;
     }
 
-    public Package(UUID id, String name, byte[] image, Restaurant restaurant, Package parent) {
+    public Package(UUID id, String name, Restaurant restaurant, Package parent) {
         this.id = id;
         this.name = name;
-        this.image = image;
         this.restaurant = restaurant;
         this.parent = parent;
     }
 
-    public Package(String name, byte[] image, Restaurant restaurant, Package parent) {
+    public Package(String name, Restaurant restaurant, Package parent) {
         this.name = name;
-        this.image = image;
         this.restaurant = restaurant;
         this.parent = parent;
     }
@@ -81,14 +74,17 @@ public class Package implements Serializable {
 
     public OutPackageDTO toDTO(){
         List<OutPackageDTO> listPackages = new ArrayList<>();
-        List<OutPackageItemDTO> listItems = new ArrayList<>();
+        List<Object> listItems = new ArrayList<>();
         for (var pack : children) listPackages.add(pack.toDTO());
-        for (var item : items) listItems.add(item.toDTO());
+        for (var item : items) listItems.add(
+                item instanceof Food? ((Food) item).foodToDTO() :
+                item instanceof Combo? ((Combo) item).comboToDTO() :
+                item.toDTO());
 
         UUID parent;
         if (this.parent == null) parent = null;
         else parent = this.parent.getId();
 
-        return new OutPackageDTO(id, name, image, parent, restaurant.getId(), listPackages, listItems);
+        return new OutPackageDTO(id, name, parent, restaurant.getId(), listPackages, listItems);
     }
 }

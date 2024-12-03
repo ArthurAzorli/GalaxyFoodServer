@@ -2,26 +2,26 @@ package br.edu.ifsp.galaxyfood.server.model.service;
 
 import br.edu.ifsp.galaxyfood.server.model.domain.RestaurantOwner;
 import br.edu.ifsp.galaxyfood.server.model.dto.InRestaurantOwnerDTO;
+import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantDAO;
 import br.edu.ifsp.galaxyfood.server.model.repository.RestaurantOwnerDAO;
+import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class RestaurantOwnerService {
 
     private final RestaurantOwnerDAO repository;
 
     private final RestaurantDAO restaurantDAO;
 
-    public RestaurantOwnerService(@NonNull RestaurantOwnerDAO repository, @NonNull RestaurantDAO restaurantDAO) {
-        this.repository = repository;
-        this.restaurantDAO = restaurantDAO;
-    }
+    private final RestaurantService restaurantService;
 
     public RestaurantOwner create(InRestaurantOwnerDTO dto) throws ExceptionController {
 
@@ -46,23 +46,47 @@ public class RestaurantOwnerService {
         return repository.getOwnerById(id);
     }
 
-    public RestaurantOwner update(InRestaurantOwnerDTO dto, UUID idRestaurant) throws ExceptionController {
+    public HashMap<String, Object> exists(String cpf){
+        var data = new HashMap<String, Object>();
+
+        final var result = repository.existsByCpf(cpf);
+        data.put("result", result);
+
+        if (result){
+            UUID id = repository.getOwnerByCpf(cpf).getId();
+            data.put("id", id);
+        }
+        return data;
+    }
+
+    public RestaurantOwner update(UUID idRestaurant, InRestaurantOwnerDTO dto) throws ExceptionController{
+        if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
-        if (idRestaurant == null) throw new ExceptionController(401, "Restaurante não especificado!");
+
         if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
+
         var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
+
         var owner = restaurant.getOwner();
+
         owner.setName(dto.name());
 
         return repository.save(owner);
     }
 
-    public void delete(UUID idRestaurant) throws ExceptionController {
-        if (idRestaurant == null) throw new ExceptionController(401, "Restaurante não especificado!");
-        if (!restaurantDAO.existsById(idRestaurant)) throw new ExceptionController(412, "Restaurante não cadastrado!");
-        var restaurant = restaurantDAO.getRestaurantById(idRestaurant);
-        if (restaurantDAO.countByOwner(restaurant.getOwner()) > 1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
-        restaurantDAO.delete(restaurant);
+    public void delete(LoginDTO dto) throws ExceptionController{
+        if (dto.login() == null || dto.login().isEmpty()) throw new ExceptionController(400, "Login not sent!");
+        if (dto.password() == null || dto.password().isEmpty()) throw new ExceptionController(400, "Password not sent!");
+
+        if (!restaurantDAO.existsRestaurantByEmail(dto.login())) throw new ExceptionController(404, "Restaurante não encontrado!");
+
+        var restaurant = restaurantDAO.getRestaurantByEmail(dto.login());
+
+        if (!restaurant.getPassword().equals(Cripto.md5(dto.password()))) throw new ExceptionController(400, "Login e/ou Senha incorreta!");
+
+        if (restaurantDAO.countByOwner(restaurant.getOwner())>1) throw new ExceptionController(401, "Este dono ainda possui outros restaurantes cadastrados!");
+
+        restaurantService.delete(dto);
         repository.delete(restaurant.getOwner());
 
         if (repository.existsById(restaurant.getOwner().getId())) throw new ExceptionController(500, "Erro ao deletar Cliente!");

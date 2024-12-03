@@ -23,7 +23,7 @@ public class ComboItem implements Serializable {
     @JoinColumn(name = "item_id")
     private Food item;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "combo_id")
     private Combo combo;
 

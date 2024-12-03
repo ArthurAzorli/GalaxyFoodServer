@@ -100,6 +100,12 @@ public class Client implements Serializable {
 
 
     public OutClientDTO toDTO(){
-        return new OutClientDTO(id, cpf, name, email, birthDate, image, addresses, phones);
+        List<Integer> bytes = new ArrayList<>();
+        if (image != null) {
+            for (byte b : image) {
+                bytes.add(b & 0xFF);
+            }
+        }
+        return new OutClientDTO(id, cpf, name, email, birthDate, bytes, addresses, phones);
     }
 }

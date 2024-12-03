@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -39,6 +41,13 @@ public class Food extends PackageItem {
     }
 
     public OutFoodDTO foodToDTO(){
-        return new OutFoodDTO(id, name, price, description ,image, parent.getId());
+        List<Integer> bytes = new ArrayList<>();
+        if (image != null) {
+            for (byte b : image) {
+                bytes.add(b & 0xFF);
+            }
+        }
+
+        return new OutFoodDTO(id, name, price, description, bytes, parent.getId());
     }
 }

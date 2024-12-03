@@ -49,7 +49,7 @@ public class Restaurant implements Serializable {
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Phone> phones = new ArrayList<>();
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name="owner_id", nullable=false, columnDefinition = "VARCHAR", referencedColumnName = "id")
     private RestaurantOwner owner;
 
@@ -93,6 +93,13 @@ public class Restaurant implements Serializable {
 
     public OutRestaurantDTO toDTO(){
 
+        List<Integer> bytes = new ArrayList<>();
+        if (image != null) {
+            for (byte b : image) {
+                bytes.add(b & 0xFF);
+            }
+        }
+
         var sum = 0.0;
         List<OutScoreDTO> scores = new ArrayList<>();
         for (var s : this.score) {
@@ -104,7 +111,7 @@ public class Restaurant implements Serializable {
         if (!this.score.isEmpty()) score = sum/this.score.size();
         else score = 0.0;
 
-        return new OutRestaurantDTO(id, cnpj, email, name, specialty, image, score, scores,  address, owner.toDTO(), phones);
+        return new OutRestaurantDTO(id, cnpj, email, name, specialty, bytes, score, scores,  address, owner.toDTO(), phones);
     }
 
 }

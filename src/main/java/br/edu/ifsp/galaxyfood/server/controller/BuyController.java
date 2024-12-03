@@ -6,8 +6,6 @@ import br.edu.ifsp.galaxyfood.server.model.dto.OutBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.BuyService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import org.hibernate.usertype.UserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,49 +21,58 @@ public class BuyController {
     @Autowired
     private BuyService service;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InBuyDTO dto, @RequestParam UUID clientId) {
+    @PostMapping("/create/{idClient}")
+    public ResponseEntity<Object> create(@PathVariable("idClient") UUID idClient, @RequestBody InBuyDTO dto){
         try {
-            var buy = service.create(dto, clientId);
+            var buy = service.create(idClient, dto);
             return ResponseEntity.status(201).body(buy.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id, @RequestParam UUID userId, @RequestParam String userType) {
+    @GetMapping("/get/{idUser}/{id}")
+    public ResponseEntity<Object> get(@PathVariable("idUser") UUID idUser, @PathVariable("id") UUID id, @RequestParam(name = "typeUser") String typeUser){
         try {
-            var buy = service.get(id, userId, userType);
-            return ResponseEntity.status(302).body(buy.toDTO());
+            var buy = service.get(idUser, id, typeUser);
+            return ResponseEntity.status(200).body(buy.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(@RequestParam UUID userId, @RequestParam String userType) {
+    @GetMapping("/get/{idUser}")
+    public ResponseEntity<Object> getAll(@PathVariable("idUser") UUID idUser, @RequestParam(name = "typeUser") String typeUser){
         try {
-            var buys = service.getAll(userId, userType);
+            var buys = service.getAll(idUser, typeUser);
+
             List<OutBuyDTO> list = new ArrayList<>();
-            for (var buy : buys) {
-                list.add(buy.toDTO());
-            }
-            return ResponseEntity.ok(list);
+            for (var buy : buys) list.add(buy.toDTO());
+            return ResponseEntity.status(200).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 
-
-    @PutMapping("/updatestatus/{id}")
-    public ResponseEntity<Object> updateStatus(@PathVariable("id") UUID buyId, @RequestParam int orderStatus, @RequestParam UUID restaurantId) {
+    @PutMapping("/updatestatus/{idRestaurant}/{id}")
+    public ResponseEntity<Object> updateStatus(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id, @RequestParam(name = "status") int orderStatus){
         try {
             var status = OrderStatus.getOrderStatus(orderStatus);
-            var buy = service.updateOrderStatus(buyId, status, restaurantId);
+            var buy = service.updateOrderStatus(idRestaurant, id, status);
 
-            return ResponseEntity.status(202).body(buy);
-        } catch (ExceptionController e) {
+            return ResponseEntity.status(202).body(buy.toDTO());
+        }catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
+    @PutMapping("/cancel/{idClient}/{id}")
+    public ResponseEntity<Object> cancel(@PathVariable("idClient") UUID idClient, @PathVariable("id") UUID id){
+        try {
+            var buy = service.cancel(idClient, id);
+
+            return ResponseEntity.status(202).body(buy.toDTO());
+        }catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }

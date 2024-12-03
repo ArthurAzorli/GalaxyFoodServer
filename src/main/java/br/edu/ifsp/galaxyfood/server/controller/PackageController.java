@@ -5,9 +5,8 @@ import br.edu.ifsp.galaxyfood.server.model.dto.OutPackageDTO;
 import br.edu.ifsp.galaxyfood.server.model.service.PackageService;
 import br.edu.ifsp.galaxyfood.server.utils.ErrorMessage;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,87 +22,84 @@ public class PackageController {
     @Autowired
     private PackageService service;
 
-
-    @PostMapping("/create")
-    public ResponseEntity<Object> create(@RequestBody InPackageDTO dto, @RequestParam UUID userId) {
+    @PostMapping("/create/{idRestaurant}")
+    public ResponseEntity<Object> create(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InPackageDTO dto){
         try {
-            var pack = service.create(dto, userId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(pack.toDTO());
+            var pack = service.create(idRestaurant, dto);
+            return ResponseEntity.status(201).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<Object> get(@PathVariable("id") UUID id) {
+    @GetMapping("/get/{idRestaurant}/{id}")
+    public ResponseEntity<Object> get(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID id){
         try {
-            var pack = service.get(id);
-            return ResponseEntity.ok(pack.toDTO());
+            var pack = service.get(idRestaurant, id);
+            return ResponseEntity.status(200).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<Object> getAll(@RequestParam UUID userId) {
+    @GetMapping("/get/{idRestaurant}")
+    public ResponseEntity<Object> getAll(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
-            var packages = service.getAll(userId);
+            var packages = service.getAllByRestaurant(idRestaurant);
+
             List<OutPackageDTO> list = new ArrayList<>();
-            for (var pack : packages) {
-                list.add(pack.toDTO());
-            }
-            return ResponseEntity.ok(list);
+            for (var pack : packages) list.add(pack.toDTO());
+
+            return ResponseEntity.status(200).body(list);
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
-    @GetMapping("/get/restaurant/{id}")
-    public ResponseEntity<Object> getAllByRestaurant(@PathVariable("id") UUID idRestaurant) {
+    @GetMapping("/root/{idRestaurant}")
+    public ResponseEntity<Object> getRoot(@PathVariable("idRestaurant") UUID idRestaurant){
         try {
-            var packages = service.getAll(idRestaurant);
-            List<OutPackageDTO> list = new ArrayList<>();
-            for (var pack : packages) {
-                list.add(pack.toDTO());
-            }
-            return ResponseEntity.ok(list);
+            var pack = service.getRoot(idRestaurant);
+            return ResponseEntity.status(200).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> update(@PathVariable("id") UUID idPackage, @RequestBody InPackageDTO dto, @RequestParam UUID userId) {
+    @PutMapping("/update/{idRestaurant}/{id}")
+    public ResponseEntity<Object> update(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idPackage, @RequestBody InPackageDTO dto){
         try {
-            var pack = service.update(idPackage, dto, userId);
-            return ResponseEntity.ok(pack.toDTO());
+            var pack = service.update(idRestaurant, idPackage, dto);
+            return ResponseEntity.status(202).body(pack.toDTO());
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable("id") UUID idPackage, @RequestParam UUID userId) {
+    @PutMapping("/move/{idRestaurant}/{idPackage}/{idParent}")
+    public ResponseEntity<Object> move(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("idPackage") UUID idPackage, @PathVariable("idParent") UUID idParent){
         try {
-            service.delete(idPackage, userId);
-            var response = new HashMap<String, Object>();
-            response.put("message", "Pasta deletada com sucesso!");
-            response.put("result", true);
-            return ResponseEntity.ok(response);
+
+            var pack = service.move(idRestaurant, idPackage, idParent);
+            return ResponseEntity.status(202).body(pack.toDTO());
+
         } catch (ExceptionController e) {
             return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorMessage("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        }
+    }
+
+    @DeleteMapping("/delete/{idRestaurant}/{id}")
+    public ResponseEntity<Object> delete(@PathVariable("idRestaurant") UUID idRestaurant, @PathVariable("id") UUID idPackage){
+        try {
+            service.delete(idRestaurant, idPackage);
+
+            var data = new HashMap<String, Object>();
+            data.put("message", "Pasta deletada com Sucesso!");
+            data.put("result", true);
+
+            return ResponseEntity.ok(data);
+        } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
         }
     }
 }
