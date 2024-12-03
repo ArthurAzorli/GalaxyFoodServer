@@ -6,8 +6,7 @@ import br.edu.ifsp.galaxyfood.server.model.domain.OrderStatus;
 import br.edu.ifsp.galaxyfood.server.model.dto.InBuyDTO;
 import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
-import jakarta.servlet.http.HttpSession;
-import lombok.NonNull;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
