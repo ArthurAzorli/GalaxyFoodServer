@@ -41,6 +41,20 @@ public class RestaurantOwnerController {
         }
     }
 
+    @GetMapping("/exists/{cpf}")
+    public ResponseEntity<Object> exists(@PathVariable("cpf") String cpf){
+        try {
+            var result = service.exists(cpf);
+
+            var data = new HashMap<String, Object>();
+            data.put("result", result);
+
+            return ResponseEntity.status(200).body(data);
+        } catch (ExceptionController e) {
+            return ResponseEntity.status(e.getStatus()).body(new ErrorMessage(e));
+        }
+    }
+
     @PutMapping("/update/{idRestaurant}")
     public ResponseEntity<Object> update(@PathVariable("idRestaurant") UUID idRestaurant, @RequestBody InRestaurantOwnerDTO dto){
         try {

@@ -43,6 +43,10 @@ public class RestaurantOwnerService {
         return repository.getOwnerById(id);
     }
 
+    public boolean exists(String cpf){
+        return repository.existsByCpf(cpf);
+    }
+
     public RestaurantOwner update(UUID idRestaurant, InRestaurantOwnerDTO dto) throws ExceptionController{
         if (idRestaurant == null) throw new ExceptionController(400, "Restaurant ID not send!");
         if (dto.name() == null) throw new ExceptionController(400, "Name not send!");
