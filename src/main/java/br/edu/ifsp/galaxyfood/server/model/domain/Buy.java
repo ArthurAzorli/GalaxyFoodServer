@@ -104,7 +104,10 @@ public class Buy implements Serializable {
     public OutBuyDTO toDTO(){
         List<OutBuyItemDTO> list = new ArrayList<>();
         for (var item : items) list.add(item.toDTO());
-        return new OutBuyDTO(id, paymentForm.getCode(), orderStatus.getCode(), date, deliveryFee, discount, sentAddress, client.toDTO(), restaurant.toDTO(), list);
+        if (client!= null)
+            return new OutBuyDTO(id, paymentForm.getCode(), orderStatus.getCode(), date, deliveryFee, discount, sentAddress, client.toDTO(), restaurant.toDTO(), list);
+        else
+            return new OutBuyDTO(id, paymentForm.getCode(), orderStatus.getCode(), date, deliveryFee, discount, sentAddress, null, restaurant.toDTO(), list);
     }
 
 }

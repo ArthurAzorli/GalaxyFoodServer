@@ -6,10 +6,7 @@ import br.edu.ifsp.galaxyfood.server.model.domain.Phone;
 import br.edu.ifsp.galaxyfood.server.model.dto.InAddressDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.InClientDTO;
 import br.edu.ifsp.galaxyfood.server.model.dto.LoginDTO;
-import br.edu.ifsp.galaxyfood.server.model.repository.AddressDAO;
-import br.edu.ifsp.galaxyfood.server.model.repository.BuyDAO;
-import br.edu.ifsp.galaxyfood.server.model.repository.ClientDAO;
-import br.edu.ifsp.galaxyfood.server.model.repository.PhoneDAO;
+import br.edu.ifsp.galaxyfood.server.model.repository.*;
 import br.edu.ifsp.galaxyfood.server.utils.Cripto;
 import br.edu.ifsp.galaxyfood.server.utils.ExceptionController;
 import lombok.AllArgsConstructor;
@@ -28,6 +25,10 @@ public class ClientService {
     private final PhoneDAO phoneDAO;
 
     private final BuyDAO buyDAO;
+
+    private final ScoreDAO scoreDAO;
+
+    private final RestaurantDAO restaurantDAO;
 
     public Client login(String login, String password) throws ExceptionController {
         if (login == null || login.isEmpty()) throw new ExceptionController(400, "Login not send!");
@@ -198,12 +199,18 @@ public class ClientService {
             buyDAO.save(buy);
         }
 
-        final var adresses = client.getAddresses();
+        for (var score : scoreDAO.getAllByClient(client.getId())){
+            score.getRestaurant().getScore().remove(score);
+            restaurantDAO.save(score.getRestaurant());
+            scoreDAO.delete(score);
+        }
+
+        final var addresses = client.getAddresses();
 
         client.getAddresses().clear();
         clientDAO.save(client);
 
-        for (var address : adresses){
+        for (var address : addresses){
             addressDAO.delete(address);
         }
 

@@ -21,10 +21,10 @@ public class Score implements Serializable {
     @Column(nullable = false, columnDefinition = "DECIMAL(7,1)")
     private BigDecimal score;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private Client client;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private Restaurant restaurant;
 
     public Score(UUID id, BigDecimal score, Client client, Restaurant restaurant) {
